@@ -8,7 +8,7 @@ import "dotenv/config";
 
 // Token expiration times (in seconds)
 export const TOKEN_EXPIRY = {
-  ACCESS: 15 * 60,          // 15 minutes
+  ACCESS: 2 * 60,          // 2 minutes
   REFRESH: 7 * 24 * 60 * 60, // 7 days
 };
 
@@ -100,7 +100,7 @@ export function refreshCookieOptions() {
   return {
     httpOnly: true,                    // Not accessible via JavaScript
     secure: isProd,                    // HTTPS only in production
-    sameSite: isProd ? "strict" : "lax", // CSRF protection
+    sameSite: isProd ? "none" : "lax", // CSRF protection
     path: "/api/v1/auth",              // Only sent to auth endpoints
     maxAge: TOKEN_EXPIRY.REFRESH * 1000, // Match token expiry (in ms)
   };
@@ -114,7 +114,7 @@ export function clearRefreshCookieOptions() {
   return {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? "strict" : "lax",
+    sameSite: isProd ? "none" : "lax",
     path: "/api/v1/auth",
   };
 }

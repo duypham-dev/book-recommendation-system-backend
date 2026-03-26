@@ -4,7 +4,7 @@ import { uploadBookFiles } from '#middlewares/upload.middleware.js';
 
 // CONTROLLERS
 // Dashboard
-import { getDashboard } from '#controllers/Admin/DashboardController.js';
+import { getDashboard, getNewUsers } from '#controllers/Admin/DashboardController.js';
 // Book management
 import {
   getBooks,
@@ -22,7 +22,7 @@ import {
   getGenresWithPagination, 
   createGenre, 
   updateGenre, 
-  deleteGenre 
+  deleteGenre
 } from '#controllers/Admin/GenreController.js';
 // User management
 import { getAllUsers } from '#controllers/Users/UserController.js';
@@ -34,7 +34,7 @@ const router = express.Router();
 // ADMIN DASHBOARD
 // ============================================
 router.get('/admin/dashboard', authenticateToken, getDashboard);
-
+router.get('/admin/dashboard/new-users', authenticateToken, getNewUsers);
 // ============================================
 // ADMIN BOOK MANAGEMENT
 // ============================================

@@ -86,7 +86,7 @@ export async function refreshTokenHandler(req, res) {
     res.cookie("refreshToken", newRefreshToken, refreshCookieOptions());
     
     logger.info('Token refreshed', { userId, oldJti, newJti });
-    
+    logger.debug('New access token issued', { userId, expiresIn: TOKEN_EXPIRY.ACCESS });
     return ApiResponse.success(res, { 
       accessToken,
       expiresIn: TOKEN_EXPIRY.ACCESS,

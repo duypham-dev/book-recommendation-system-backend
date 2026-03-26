@@ -10,7 +10,6 @@ export const getDashboardStats = async (topRatedPage = 0, topRatedSize = 5, topF
     totalBooks,
     totalGenres,
     totalAuthors,
-    newUsersLast7Days,
     topRatedBooks,
     topFavoritedBooks,
   ] = await Promise.all([
@@ -32,8 +31,6 @@ export const getDashboardStats = async (topRatedPage = 0, topRatedSize = 5, topF
     // Total authors
     prisma.authors.count(),
     
-    // New users in last 7 days
-    getNewUsersLast7Days(),
     
     // Top rated books
     getTopRatedBooks(topRatedPage, topRatedSize),
@@ -47,7 +44,6 @@ export const getDashboardStats = async (topRatedPage = 0, topRatedSize = 5, topF
     totalBooks,
     totalGenres,
     totalAuthors,
-    newUsersLast7Days,
     topRatedBooks,
     topFavoritedBooks,
   };
@@ -56,35 +52,41 @@ export const getDashboardStats = async (topRatedPage = 0, topRatedSize = 5, topF
 /**
  * Get new users count per day for last 7 days
  */
-async function getNewUsersLast7Days() {
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  sevenDaysAgo.setHours(0, 0, 0, 0);
+async function getNewUsersByTime(days) {
+  // 1. Xác định đúng ranh giới thời gian (Bao gồm cả hôm nay)
+  const startDate = new Date();
+  startDate.setHours(0, 0, 0, 0); // Reset về 00:00:00 của ngày hôm nay
+  startDate.setDate(startDate.getDate() - (days - 1)); // Lùi về đúng số ngày
 
+  // 2. Lấy dữ liệu từ DB
   const users = await prisma.users.findMany({
     where: {
-      created_at: { gte: sevenDaysAgo },
+      created_at: { gte: startDate },
       roles: { role_name: { not: 'admin' } },
     },
     select: { created_at: true },
   });
 
-  // Group by date
+  // 3. Khởi tạo Object đếm với định dạng ngày theo Local (YYYY-MM-DD)
   const countByDate = {};
-  for (let i = 0; i < 7; i++) {
-    const date = new Date();
-    date.setDate(date.getDate() - (6 - i));
-    const dateStr = date.toISOString().split('T')[0];
+  for (let i = 0; i < days; i++) {
+    const d = new Date(startDate);
+    d.setDate(d.getDate() + i);
+    const dateStr = d.toLocaleDateString('sv-SE'); 
     countByDate[dateStr] = 0;
   }
 
+  // 4. Đếm số lượng
   users.forEach(user => {
-    const dateStr = user.created_at.toISOString().split('T')[0];
+    // Ép created_at (thường là UTC) về đúng múi giờ Local trước khi lấy chuỗi
+    const dateStr = new Date(user.created_at).toLocaleDateString('sv-SE');
+    
     if (countByDate[dateStr] !== undefined) {
       countByDate[dateStr]++;
     }
   });
 
+  // 5. Trả về mảng
   return Object.entries(countByDate).map(([date, count]) => ({
     date,
     count,
@@ -201,4 +203,5 @@ async function getTopFavoritedBooks(page = 0, size = 5) {
 
 export const dashboardService = {
   getDashboardStats,
+  getNewUsersByTime,
 };
