@@ -3,16 +3,14 @@ import { prisma } from '#lib/prisma.js';
 /**
  * Get dashboard statistics
  */
-export const getDashboardStats = async (topRatedPage = 0, topRatedSize = 5, topFavoritedPage = 0, topFavoritedSize = 5) => {
+export const getDashboardStats = async () => {
   // Get counts
   const [
     totalUsers,
     totalBooks,
     totalGenres,
     totalAuthors,
-    topRatedBooks,
-    topFavoritedBooks,
-  ] = await Promise.all([
+  ] = await prisma.$transaction([
     // Total users (excluding admins)
     prisma.users.count({
       where: {
@@ -30,13 +28,6 @@ export const getDashboardStats = async (topRatedPage = 0, topRatedSize = 5, topF
     
     // Total authors
     prisma.authors.count(),
-    
-    
-    // Top rated books
-    getTopRatedBooks(topRatedPage, topRatedSize),
-    
-    // Top favorited books
-    getTopFavoritedBooks(topFavoritedPage, topFavoritedSize),
   ]);
 
   return {
@@ -44,8 +35,6 @@ export const getDashboardStats = async (topRatedPage = 0, topRatedSize = 5, topF
     totalBooks,
     totalGenres,
     totalAuthors,
-    topRatedBooks,
-    topFavoritedBooks,
   };
 };
 
@@ -204,4 +193,6 @@ async function getTopFavoritedBooks(page = 0, size = 5) {
 export const dashboardService = {
   getDashboardStats,
   getNewUsersByTime,
-};
+  getTopRatedBooks,
+  getTopFavoritedBooks,
+};  

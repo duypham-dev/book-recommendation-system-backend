@@ -6,10 +6,15 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import "dotenv/config";
 
-// Token expiration times (in seconds)
+// Token expiration times
+// IMPORTANT: Use string format with explicit unit suffix so the `ms` library
+// inside jsonwebtoken never misinterprets a bare number-string as milliseconds.
+// e.g. "60" (string) → 60 ms !!  vs  "2m" → 2 minutes  vs  120 (number) → 120 s
 export const TOKEN_EXPIRY = {
-  ACCESS: 2 * 60,          // 2 minutes
-  REFRESH: 7 * 24 * 60 * 60, // 7 days
+  ACCESS: "2m",                // 2 minutes  (string with unit → ms library parses correctly)
+  REFRESH: "7d",               // 7 days
+  ACCESS_SECONDS: 2 * 60,     // numeric form for non-jwt uses (cookie maxAge, frontend hint)
+  REFRESH_SECONDS: 7 * 24 * 60 * 60,
 };
 
 /**
@@ -36,7 +41,7 @@ export function signAccessToken(user) {
     user,
     process.env.JWT_ACCESS_SECRECT,
     {
-      expiresIn: TOKEN_EXPIRY.ACCESS,
+      expiresIn: TOKEN_EXPIRY.ACCESS, // "2m" string with unit — safe from ms() misparse
       subject: String(user.userId),
       issuer: "tekbook-api",
       audience: "tekbook-client",
@@ -58,7 +63,7 @@ export function signRefreshToken(userId) {
     { type: 'refresh' },
     process.env.JWT_REFRESH_SECRECT,
     {
-      expiresIn: TOKEN_EXPIRY.REFRESH,
+      expiresIn: TOKEN_EXPIRY.REFRESH, // "7d" string with unit
       subject: String(userId),
       issuer: "tekbook-api",
       audience: "tekbook-client",
@@ -102,7 +107,7 @@ export function refreshCookieOptions() {
     secure: isProd,                    // HTTPS only in production
     sameSite: isProd ? "none" : "lax", // CSRF protection
     path: "/api/v1/auth",              // Only sent to auth endpoints
-    maxAge: TOKEN_EXPIRY.REFRESH * 1000, // Match token expiry (in ms)
+    maxAge: TOKEN_EXPIRY.REFRESH_SECONDS * 1000, // Match token expiry (in ms)
   };
 }
 

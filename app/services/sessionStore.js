@@ -10,8 +10,10 @@ import crypto from 'crypto';
 import { redisClient } from '#config/redis.js';
 import { logger } from '#utils/logger.js';
 
+import { TOKEN_EXPIRY } from '#utils/jwt.js';
+
 // Session TTL in seconds (matches refresh token expiry)
-const SESSION_TTL = 7 * 24 * 60 * 60; // 7 days
+const SESSION_TTL = TOKEN_EXPIRY.REFRESH_SECONDS;
 
 /**
  * Hash a token using SHA-256 (one-way, for storage)

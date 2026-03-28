@@ -7,28 +7,46 @@ import { dashboardService } from "#services/dashboardService.js";
 /**
  * GET /admin/dashboard - Get dashboard statistics
  */
-export const getDashboard = async (req, res) => {
+export const  getTopRatedBooks = async (req, res) => {
   try {
     const {
-      topRatedPage = 0,
-      topRatedSize = 5,
-      topFavoritedPage = 0,
-      topFavoritedSize = 5
+      page = 0,
+      size = 5
     } = req.query;
-
-    const dashboard = await dashboardService.getDashboardStats(
-      parseInt(topRatedPage),
-      parseInt(topRatedSize),
-      parseInt(topFavoritedPage),
-      parseInt(topFavoritedSize)
-    );
-
-    return ApiResponse.success(res, dashboard, 'Dashboard fetched successfully');
+    console.log('querry params:', req.query);
+    const topRatedBooks = await dashboardService.getTopRatedBooks(parseInt(page), parseInt(size));
+    return ApiResponse.success(res, topRatedBooks, 'Top rated books fetched successfully');
   } catch (error) {
-    logger.error('Get dashboard error:', error);
-    return ApiResponse.error(res, 'Failed to fetch dashboard', 500);
+    logger.error('Get top rated books error:', error);
+    return ApiResponse.error(res, 'Failed to fetch top rated books', 500);
   }
 };
+
+export const getTopFavoritedBooks = async (req, res) => {
+  try {
+    const {
+      page = 0,
+      size = 5
+    } = req.query;
+    console.log('querry params:', req.query);
+    const topFavoritedBooks = await dashboardService.getTopFavoritedBooks(parseInt(page), parseInt(size));
+    return ApiResponse.success(res, topFavoritedBooks, 'Top favorited books fetched successfully');
+  } catch (error) {
+    logger.error('Get top favorited books error:', error);
+    return ApiResponse.error(res, 'Failed to fetch top favorited books', 500);
+  }
+}
+
+
+export const getStats = async (req, res) => {
+  try{
+    const dashboardStats = await dashboardService.getDashboardStats();
+    return ApiResponse.success(res, dashboardStats, 'Dashboard stats fetched successfully');
+  } catch (error) {
+    logger.error('Get dashboard stats error:', error);
+    return ApiResponse.error(res, 'Failed to fetch dashboard stats', 500);
+  }
+}
 
 export const getNewUsers = async (req, res) => {
   try {

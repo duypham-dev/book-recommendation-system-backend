@@ -14,18 +14,25 @@ import {
 } from "#services/bookService.js";
 import { getBookRatingsPaginated as getBookRatingsPaginatedService } from "#services/ratingService.js";
 
+
 // Controller to get all books with pagination
 const getAllBooks = async (req, res) => {
     // Extract pagination parameters
-    const { page = 0, size = 12 } = req.query;
+    const { cursor } = req.query;
 
+    const cursorId = cursor ? parseInt(cursor, 10) : undefined;
+    console.log('query params:', req.query);
     try {
-        const books = await getAllBooksService(parseInt(page), parseInt(size));
+        const books = await getAllBooksService(cursorId);
 
-        logger.info(`Fetched ${books.data.length} books (page ${page}, size ${size})`);
+        logger.info(`Fetched ${books.data.length} books (cursor ${cursorId})`);
 
         const booksResponse = toBookListResponse(books.data);
-        return ApiResponse.success(res, booksResponse, 'Books fetched successfully');
+        const responsePayload = {
+            content: booksResponse,
+            nextCursor: books.nextCursor,
+        };
+        return ApiResponse.success(res, responsePayload, 'Books fetched successfully');
     } catch (err) {
         logger.error(`Error fetching books: ${err.message}`);
         return ApiResponse.error(res, 'Failed to fetch books', 500);

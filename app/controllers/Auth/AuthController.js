@@ -254,7 +254,7 @@ export const loginWithIdentifierAndPassword = async (req, res) => {
     return ApiResponse.success(res, {
       user: userPayload,
       accessToken,
-      expiresIn: TOKEN_EXPIRY.ACCESS,
+      expiresIn: TOKEN_EXPIRY.ACCESS_SECONDS,
     }, 'Đăng nhập thành công');
 
   } catch (error) {

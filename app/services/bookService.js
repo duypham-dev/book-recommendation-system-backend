@@ -2,45 +2,38 @@ import { prisma } from '#lib/prisma.js';
 import { generatePresignedUrl } from '#config/storageConfig.js';
 
 // Function to get all books with pagination
-const getAllBooks = async (page = 0, size = 12) => {
-  const skip = page * size;
-
-  const [books, total] = await Promise.all([
-    prisma.books.findMany({
-      where: {
-        is_deleted: false,
-      },
-      orderBy: { book_id: 'asc' },
-      skip: skip,
-      take: size,
-      include: {
-        book_genres: {
-          include: {
-            genres: true,
-          },
-        },
-        book_authors: {
-          include: {
-            authors: true,
-          },
+const getAllBooks = async (cursorId) => {
+  const limit = 12;
+  
+  const books = await prisma.books.findMany({
+    take: limit,
+    skip: cursorId ? 1 : 0,
+    cursor: cursorId ? { book_id: cursorId } : undefined,
+    where: {
+      is_deleted: false,
+    },
+    include: {
+      book_authors: {
+        include: {
+          authors: true,
         },
       },
-    }),
-    prisma.books.count({
-      where: {
-        is_deleted: false,
-      },
-    }),
-  ]);
+    },
+    orderBy: {
+      book_id: 'asc',
+    },
+  })
 
+  // find the next cursor 
+  let nextCursor = null;
+  
+  if (books.length === limit) {
+    nextCursor = books[books.length - 1].book_id; 
+  }
+  console.log("nextCursor:", nextCursor);
   return {
     data: books,
-    pagination: {
-      page: page,
-      size: size,
-      total: total,
-      totalPages: Math.ceil(total / size),
-    }
+    nextCursor,
   };
 }
 
