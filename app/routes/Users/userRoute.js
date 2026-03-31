@@ -14,10 +14,6 @@ import {
   createOrUpdateRating,
   deleteRating,
   getAverageRating,
-  getBookmarks,
-  createBookmark,
-  updateBookmark,
-  deleteBookmark,
   banUser,
   unbanUser,
   banUsersBulk,
@@ -59,12 +55,6 @@ router.post('/users/:userId/books/:bookId/history', authenticateToken, recordHis
 // Ratings routes (create/update/delete require auth)
 router.post('/users/:userId/books/:bookId/ratings', authenticateToken, createOrUpdateRating);
 router.delete('/users/:userId/books/:bookId/ratings', authenticateToken, deleteRating);
-
-// Bookmarks routes
-router.get('/users/:userId/books/:bookId/bookmarks', authenticateToken, getBookmarks);
-router.post('/users/:userId/books/:bookId/bookmarks', authenticateToken, createBookmark);
-router.put('/users/:userId/bookmarks/:bookmarkId', authenticateToken, updateBookmark);
-router.delete('/users/:userId/bookmarks/:bookmarkId', authenticateToken, deleteBookmark);
 
 // User management (admin actions but can be user-initiated)
 router.patch('/users/:userId/ban', authenticateToken, banUser);

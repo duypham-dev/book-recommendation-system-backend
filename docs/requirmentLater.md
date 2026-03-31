@@ -24,7 +24,14 @@
 
 [] BIGUPDATE: Thêm tính năng đăng kí hội viên (tích hợp thanh toán), tích hợp sách phải đăng kí hội viên mới xem được.
 
+[] Fix import các modle từ controller sang route hoặc từ service sang route cho gọn
+
+
+
 FRONT END
+
+[] Tiến độ đọc sách ở front end đang track bất kể khi user đọc ngược lại
+
 Nếu muốn tối ưu thêm trong tương lai:
 
 Add Error Boundaries cho genre sections

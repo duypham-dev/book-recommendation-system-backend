@@ -5,6 +5,7 @@ const router = express.Router();
 import { UserBookRouter } from '#routes/Users/bookRoute.js';
 import { UserGenreRouter } from '#routes/Users/genreRoute.js';
 import { UserRouter } from '#routes/Users/userRoute.js';
+import { BookmarkRouter } from '#routes/Users/bookmarkRoute.js';
 import { AuthorRouter } from '#routes/Users/authorRoute.js';
 import { AuthRouter } from '#routes/authRoute.js';
 
@@ -20,6 +21,7 @@ router.get('/health', (req, res) => {
 router.use(UserBookRouter);
 router.use(UserGenreRouter);
 router.use(UserRouter);
+router.use(BookmarkRouter);
 router.use(AuthorRouter);
 
 // Mount auth routes

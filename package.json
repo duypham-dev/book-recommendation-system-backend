@@ -12,7 +12,8 @@
     "#middlewares/*": "./app/middlewares/*",
     "#config/*": "./app/config/*",
     "#mappers/*": "./app/mappers/*",
-    "#validators/*": "./app/validators/*"
+    "#validators/*": "./app/validators/*",
+    "#constants/*": "./app/constants/*"
   },
   "scripts": {
     "dev": "nodemon server.js",
