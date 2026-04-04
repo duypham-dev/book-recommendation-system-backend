@@ -38,19 +38,19 @@ router.get('/users/:userId/books/:bookId/average-rating', getAverageRating);
 // ============================================
 
 // Profile routes
-router.get('/users/:userId', authenticateToken, getUserProfile);
-router.put('/users/:userId/update', authenticateToken, updateUserProfile);
-router.patch('/users/:userId/avatar', authenticateToken, uploadAvatarFile, updateUserAvatar);
-router.patch('/users/:userId/change-password', authenticateToken, changeUserPassword);
+router.get('/users/profile', authenticateToken, getUserProfile);
+router.put('/users/profile', authenticateToken, updateUserProfile);
+router.patch('/users/avatar', authenticateToken, uploadAvatarFile, updateUserAvatar);
+router.patch('/users/change-password', authenticateToken, changeUserPassword);
 
 // Favorites routes
-router.get('/users/:userId/favorites', authenticateToken, getUserFavorites);
-router.post('/users/:userId/favorites/:bookId', authenticateToken, addFavorite);
-router.delete('/users/:userId/favorites/:bookId', authenticateToken, removeFavorite);
+router.get('/users/favorites', authenticateToken, getUserFavorites);
+router.post('/users/favorites/:bookId', authenticateToken, addFavorite);
+router.delete('/users/favorites/:bookId', authenticateToken, removeFavorite);
 
 // History routes
-router.get('/users/:userId/history', authenticateToken, getUserHistory);
-router.post('/users/:userId/books/:bookId/history', authenticateToken, recordHistory);
+router.get('/users/history', authenticateToken, getUserHistory);
+router.post('/users/books/:bookId/history', authenticateToken, recordHistory);
 
 // Ratings routes (create/update/delete require auth)
 router.post('/users/:userId/books/:bookId/ratings', authenticateToken, createOrUpdateRating);

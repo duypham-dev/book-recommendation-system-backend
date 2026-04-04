@@ -36,8 +36,8 @@ import { uploadToCloudinary, deleteFromCloudinary, CLOUDINARY_FOLDERS } from "#s
  */
 export const getUserProfile = async (req, res) => {
   try {
-    const { userId } = req.params;
-    
+    const { userId } = req.user;
+    logger.info(`Fetching profile for user ${userId}`);
     // 1. Call service to get raw entity
     const user = await userService.getUserById(userId);
     
@@ -60,9 +60,11 @@ export const getUserProfile = async (req, res) => {
  */
 export const updateUserProfile = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.user;
     const { username, fullName, phoneNumber, avatarUrl } = req.body;
-    
+
+    logger.info(`Updating profile for user ${userId} with data: ${JSON.stringify(req.body)}`);
+
     // Verify user owns this profile or is admin
     if (req.user.userId !== userId && req.user.role !== 'ADMIN') {
       return ApiResponse.error(res, 'Unauthorized', 403);
@@ -113,7 +115,7 @@ export const updateUserProfile = async (req, res) => {
  */
 export const updateUserAvatar = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.user;
 
     // Verify user owns this profile
     if (!userId || req.user.userId !== userId) {
@@ -172,7 +174,7 @@ export const updateUserAvatar = async (req, res) => {
  */
 export const changeUserPassword = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.user;
     const { currentPassword, newPassword } = req.body;
     
     // Verify user owns this profile
@@ -216,7 +218,8 @@ export const changeUserPassword = async (req, res) => {
  */
 export const getUserFavorites = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId }  = req.user;
+    logger.info(`Fetching favorites for user ${userId}`);
     const { page = 0, size = 12 } = req.query;
     
     // 1. Call service to get raw entities with pagination
@@ -237,7 +240,8 @@ export const getUserFavorites = async (req, res) => {
  */
 export const addFavorite = async (req, res) => {
   try {
-    const { userId, bookId } = req.params;
+    const { userId } = req.user;
+    const { bookId } = req.params;
     
     // Verify user owns this action
     if (req.user.userId !== userId) {
@@ -266,7 +270,8 @@ export const addFavorite = async (req, res) => {
  */
 export const removeFavorite = async (req, res) => {
   try {
-    const { userId, bookId } = req.params;
+    const { userId } = req.user;
+    const { bookId } = req.params;
     
     // Verify user owns this action
     if (req.user.userId !== userId) {
@@ -295,7 +300,7 @@ export const removeFavorite = async (req, res) => {
  */
 export const getUserHistory = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.user;
     const { page = 0, size = 10 } = req.query;
     
     // 1. Call service to get raw data
@@ -316,7 +321,9 @@ export const getUserHistory = async (req, res) => {
  */
 export const recordHistory = async (req, res) => {
   try {
-    const { userId, bookId } = req.params;
+    const { userId } = req.user;
+
+    const { bookId } = req.params;
     const { progress } = req.body;
     
     // Verify user owns this action
