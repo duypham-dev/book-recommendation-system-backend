@@ -1,4 +1,4 @@
-import { activateAccount } from "#services/activateAccountService.js";
+import { activateAccount } from "#services/activate-account.service.js";
 import { ApiResponse, logger } from "#utils/index.js";
 
 export const activateAccountHandler = async (req, res) => {

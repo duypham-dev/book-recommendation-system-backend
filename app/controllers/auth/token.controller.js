@@ -12,7 +12,7 @@ import {
   TOKEN_EXPIRY 
 } from '#utils/jwt.js';
 import { authService } from "#services/auth.service.js";
-import { sessionStore } from "#services/sessionStore.js";
+import { sessionStore } from "#services/session-store.service.js";
 
 /**
  * Extract client metadata for session tracking

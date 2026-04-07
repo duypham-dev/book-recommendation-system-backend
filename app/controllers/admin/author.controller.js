@@ -2,7 +2,7 @@
  * Author Controller
  */
 import { ApiResponse, logger } from "#utils/index.js";
-import { authorService } from "#services/authorService.js";
+import { authorService } from "#services/author.service.js";
 
 /**
  * GET /authors - Get all authors

@@ -14,8 +14,8 @@ import {
   TOKEN_EXPIRY
 } from "#utils/jwt.js";
 import { authService } from "#services/auth.service.js";
-import { sessionStore } from "#services/sessionStore.js";
-import {sendActivationLink} from "#services/activateAccountService.js";
+import { sessionStore } from "#services/session-store.service.js";
+import {sendActivationLink} from "#services/activate-account.service.js";
 import { hashPassword, comparePassword } from "#utils/hashPassword.js";
 
 // =============================================================================

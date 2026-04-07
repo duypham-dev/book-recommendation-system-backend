@@ -2,15 +2,21 @@ import express from 'express';
 const router = express.Router();
 
 // USER routes
-import { UserBookRouter } from '#routes/user/bookRoute.js';
-import { UserGenreRouter } from '#routes/user/genreRoute.js';
-import { UserRouter } from '#routes/user/userRoute.js';
-import { BookmarkRouter } from '#routes/user/bookmarkRoute.js';
-import { AuthorRouter } from '#routes//authorRoute.js';
-import { AuthRouter } from '#routes/authRoute.js';
+import { userBookRouter } from '#routes/user/book.routes.js';
+import { userGenreRouter } from '#routes/user/genre.routes.js';
+import { bookmarkRouter } from '#routes/user/bookmark.routes.js';
+import { historyRouter } from '#routes/user/history.routes.js';
+import { profileRouter } from '#routes/user/profile.routes.js';
+import { ratingRouter } from '#routes/user/rating.routes.js';
+import { favoriteRouter } from '#routes/user/favorite.routes.js';
+import { AuthRouter } from '#routes/auth/auth.routes.js';
 
 // ADMIN routes
-import { adminRouter } from '#routes/admin/AdminRoute.js';
+import { authorRouter } from '#routes/admin/author.routes.js';
+import { adminBookRouter } from '#routes/admin/book.routes.js';
+import { adminGenreRouter } from '#routes/admin/genre.routes.js';
+import { userManagementRouter } from '#routes/admin/user.routes.js';
+import { dashboardRouter } from '#routes/admin/dashboard.routes.js';
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -18,16 +24,22 @@ router.get('/health', (req, res) => {
 });
 
 // Mount user routes
-router.use(UserBookRouter);
-router.use(UserGenreRouter);
-router.use(UserRouter);
-router.use(BookmarkRouter);
-router.use(AuthorRouter);
+router.use(userBookRouter);
+router.use(userGenreRouter);
+router.use(bookmarkRouter);
+router.use(favoriteRouter);
+router.use(historyRouter);
+router.use(profileRouter);
+router.use(ratingRouter);
 
 // Mount auth routes
 router.use(AuthRouter);
 
 // Mount admin routes
-router.use(adminRouter);
+router.use(authorRouter);
+router.use(adminBookRouter);
+router.use(adminGenreRouter);
+router.use(userManagementRouter);
+router.use(dashboardRouter);
 
 export default router;

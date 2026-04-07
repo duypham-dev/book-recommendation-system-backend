@@ -10,7 +10,7 @@ import {
     getBookReadUrl,
     downloadBook,
     getBookRatingsPaginated,
-} from '#controllers/users/book.controller.js';
+} from '#controllers/user/book.controller.js';
 
 const router = express.Router();
 
@@ -27,4 +27,4 @@ router.get('/books/:bookId/preview', getBookPreview);
 router.get('/books/:bookId/ratings', getBookRatingsPaginated);
 router.get('/books/:bookId', getBookById);
 
-export {router as UserBookRouter};
+export {router as userBookRouter};

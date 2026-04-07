@@ -1,7 +1,7 @@
 import { prisma } from '#lib/prisma.js';
 import { hashPassword } from '#utils/hashPassword.js';
 import { logger } from '#utils/index.js';
-import { sendPasswordResetEmail } from './emailService.js';
+import { sendPasswordResetEmail } from './email.service.js';
 import { TOKEN_TYPES, TOKEN_BYTES, RESET_TOKEN_EXPIRY_MINUTES } from '../constants/tokenTypes.js';
 import { generateToken, hashToken } from '../utils/token.util.js';
 

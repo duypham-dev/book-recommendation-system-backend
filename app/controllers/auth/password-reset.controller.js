@@ -2,7 +2,7 @@ import { ApiResponse, logger } from '#utils/index.js';
 import {
   requestPasswordReset,
   resetPassword as resetPasswordService,
-} from '#services/passwordResetService.js';
+} from '#services/password-reset.service.js';
 
 // =============================================================================
 // FORGOT PASSWORD

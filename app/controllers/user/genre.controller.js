@@ -1,5 +1,5 @@
 import { ApiResponse, logger } from "#utils/index.js";
-import {genreService} from "#services/genreService.js";
+import {genreService} from "#services/genre.service.js";
 import { toGenreListResponse, toGenreResponse, toGenrePaginatedResponse } from "#mappers/genre.mapper.js";
 /**
  * GET /books/genres - Get all genres

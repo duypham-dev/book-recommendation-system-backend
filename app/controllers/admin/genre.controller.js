@@ -7,7 +7,7 @@
  * - Mapper transforms entities to API response format
  */
 import { ApiResponse, logger } from "#utils/index.js";
-import { genreService } from "#services/genreService.js";
+import { genreService } from "#services/genre.service.js";
 import { toGenreResponse, toGenrePaginatedResponse } from "#mappers/genre.mapper.js";
 
 /**

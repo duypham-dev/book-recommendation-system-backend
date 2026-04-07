@@ -5,7 +5,7 @@ import {
   createBookmark,
   updateBookmark,
   deleteBookmark,
-} from '#controllers/users/bookmark.controller.js';
+} from '#controllers/user/bookmark.controller.js';
 
 const router = express.Router();
 
@@ -18,4 +18,4 @@ router.post('/users/:userId/books/:bookId/bookmarks', authenticateToken, createB
 router.put('/users/:userId/bookmarks/:bookmarkId', authenticateToken, updateBookmark);
 router.delete('/users/:userId/bookmarks/:bookmarkId', authenticateToken, deleteBookmark);
 
-export { router as BookmarkRouter };
+export { router as bookmarkRouter };

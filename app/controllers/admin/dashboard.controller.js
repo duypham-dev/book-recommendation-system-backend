@@ -2,7 +2,7 @@
  * Admin Dashboard Controller
  */
 import { ApiResponse, logger } from "#utils/index.js";
-import { dashboardService } from "#services/dashboardService.js";
+import { dashboardService } from "#services/dashboard.service.js";
 
 /**
  * GET /admin/dashboard - Get dashboard statistics

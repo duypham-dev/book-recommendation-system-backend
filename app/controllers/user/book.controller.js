@@ -12,7 +12,7 @@ import {
     getBookReadUrl as getBookReadUrlService,
     getBookDownloadUrl as getBookDownloadUrlService,
 } from "#services/book.service.js";
-import { getBookRatingsPaginated as getBookRatingsPaginatedService } from "#services/ratingService.js";
+import { getBookRatingsPaginated as getBookRatingsPaginatedService } from "#services/rating.service.js";
 
 
 // Controller to get all books with pagination

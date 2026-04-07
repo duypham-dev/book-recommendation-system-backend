@@ -9,10 +9,10 @@ import {
   logoutAll,
   getSessions,
   getAuthprofile
-} from '../controllers/auth/auth.controller.js';
-import { refreshTokenHandler } from '../controllers/auth/token.controller.js';
-import { forgotPassword, resetPasswordHandler } from '../controllers/auth/password-reset.controller.js';
-import {activateAccountHandler} from '../controllers/auth/activate-account.controller.js';
+} from '../../controllers/auth/auth.controller.js';
+import { refreshTokenHandler } from '../../controllers/auth/token.controller.js';
+import { forgotPassword, resetPasswordHandler } from '../../controllers/auth/password-reset.controller.js';
+import {activateAccountHandler} from '../../controllers/auth/activate-account.controller.js';
 
 // MIDDLEWARES
 import { authenticateToken } from '#middlewares/authenticateToken.js';

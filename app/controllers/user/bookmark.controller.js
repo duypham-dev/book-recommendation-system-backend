@@ -3,7 +3,7 @@
  * Handles bookmark CRUD operations for users
  */
 import { ApiResponse, logger } from "#utils/index.js";
-import { bookmarkService } from "#services/bookmarkService.js";
+import { bookmarkService } from "#services/bookmark.service.js";
 import { toBookmarkListResponse, toBookmarkResponse } from "#mappers/bookmark.mapper.js";
 
 // ============================================

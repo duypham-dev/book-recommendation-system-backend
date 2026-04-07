@@ -1,6 +1,6 @@
 import { prisma } from '#lib/prisma.js';
 import { logger } from '#utils/index.js';
-import { sendAccountActivationEmail } from './emailService.js';
+import { sendAccountActivationEmail } from './email.service.js';
 import { TOKEN_TYPES, TOKEN_BYTES, ACTIVATE_TOKEN_EXPIRY_MINUTES } from '../constants/tokenTypes.js';
 import { generateToken, hashToken } from '../utils/token.util.js';
 
