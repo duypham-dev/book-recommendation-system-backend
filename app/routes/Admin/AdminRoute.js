@@ -44,7 +44,12 @@ router.get('/admin/dashboard/new-users', authenticateToken, authorizeRole(ROLES.
 // ============================================
 // ADMIN BOOK MANAGEMENT
 // ============================================
-router.get('/admin/books/deleted', authenticateToken, authorizeRole(ROLES.ADMIN), getDeletedBooksHandler);
+router.get('/admin/books/deleted',
+  authenticateToken, 
+  authorizeRole(ROLES.ADMIN), 
+  getDeletedBooksHandler
+);
+
 router.patch('/admin/books/restore/:bookId', authenticateToken, authorizeRole(ROLES.ADMIN), restoreBookHandler);
 router.get('/admin/books', authenticateToken, authorizeRole(ROLES.ADMIN), getBooks);
 router.post('/admin/books/create', authenticateToken,  authorizeRole(ROLES.ADMIN), uploadBookFiles, createBookHandler);
