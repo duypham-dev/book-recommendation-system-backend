@@ -17,7 +17,7 @@ import {
   banUser,
   unbanUser,
   banUsersBulk,
-} from '#controllers/Users/UserController.js';
+} from '#controllers/users/UserController.js';
 
 import { uploadAvatarFile } from '#middlewares/upload.middleware.js';
 

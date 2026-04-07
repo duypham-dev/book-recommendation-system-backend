@@ -10,7 +10,7 @@ import {
     getBookReadUrl,
     downloadBook,
     getBookRatingsPaginated,
-} from '#controllers/Users/BookController.js';
+} from '#controllers/users/book.controller.js';
 
 const router = express.Router();
 

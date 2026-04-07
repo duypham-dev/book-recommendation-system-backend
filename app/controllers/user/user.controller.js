@@ -9,7 +9,7 @@
  */
 import { ApiResponse, logger } from "#utils/index.js";
 import { userService } from "#services/userService.js";
-import { checkExistingUser } from "#services/authService.js";
+import { checkExistingUser } from "#services/auth.service.js";
 import { favoriteService } from "#services/favoriteService.js";
 import { historyService } from "#services/historyService.js";
 import { ratingService } from "#services/ratingService.js";

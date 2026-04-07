@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllAuthors, getAuthorById, createAuthor, updateAuthor, deleteAuthor } from '#controllers/Users/AuthorController.js';
+import { getAllAuthors, getAuthorById, createAuthor, updateAuthor, deleteAuthor } from '#controllers/users/AuthorController.js';
 import { authenticateToken } from '#middlewares/authenticateToken.js';
 
 const router = express.Router();

@@ -5,7 +5,7 @@ import {
   createBookmark,
   updateBookmark,
   deleteBookmark,
-} from '#controllers/Users/BookMarkController.js';
+} from '#controllers/users/bookmark.controller.js';
 
 const router = express.Router();
 

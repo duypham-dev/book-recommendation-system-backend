@@ -13,7 +13,7 @@ import {
   verifyRefreshToken,
   TOKEN_EXPIRY
 } from "#utils/jwt.js";
-import { authService } from "#services/authService.js";
+import { authService } from "#services/auth.service.js";
 import { sessionStore } from "#services/sessionStore.js";
 import {sendActivationLink} from "#services/activateAccountService.js";
 import { hashPassword, comparePassword } from "#utils/hashPassword.js";

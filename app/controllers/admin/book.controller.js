@@ -10,7 +10,7 @@ import {
   hardDeleteBook,
   getBookFormats,
   getBookCoverUrl,
-} from "#services/bookService.js";
+} from "#services/book.service.js";
 import { uploadToMinio, deleteFromMinio } from "#config/storageConfig.js";
 import { uploadToCloudinary, deleteFromCloudinary, CLOUDINARY_FOLDERS } from "#services/storage.service.js";
 

@@ -5,7 +5,7 @@ import {ROLES} from '#constants/roles.js';
 import { uploadBookFiles } from '#middlewares/upload.middleware.js';
 
 // Dashboard Controllers
-import { getTopFavoritedBooks, getTopRatedBooks, getStats, getNewUsers } from '#controllers/Admin/DashboardController.js';
+import { getTopFavoritedBooks, getTopRatedBooks, getStats, getNewUsers } from '#controllers/admin/dashboard.controller.js';
 
 // Book management Controllers
 import {
@@ -18,7 +18,7 @@ import {
   getDeletedBooksHandler,
   restoreBookHandler,
   hardDeleteBookHandler,
-} from '#controllers/Admin/BookController.js';
+} from '#controllers/admin/book.controller.js';
 
 // Genre management Controllers
 import { 
@@ -26,10 +26,10 @@ import {
   createGenre, 
   updateGenre, 
   deleteGenre
-} from '#controllers/Admin/GenreController.js';
+} from '#controllers/admin/genre.controller.js';
 
 // User management Controllers
-import { getAllUsers } from '#controllers/Users/UserController.js';
+import { getAllUsers } from '#controllers/users/UserController.js';
 
 
 const router = express.Router();
@@ -74,4 +74,4 @@ router.delete('/admin/genres/delete/:genreId', authenticateToken, authorizeRole(
 // ============================================
 router.get('/admin/users', authenticateToken, authorizeRole(ROLES.ADMIN), getAllUsers);
 
-export { router as AdminRouter };
+export { router as adminRouter };

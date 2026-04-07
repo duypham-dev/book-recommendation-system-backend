@@ -11,7 +11,7 @@ import {
     getBookByKeyword as getBookByKeywordService,
     getBookReadUrl as getBookReadUrlService,
     getBookDownloadUrl as getBookDownloadUrlService,
-} from "#services/bookService.js";
+} from "#services/book.service.js";
 import { getBookRatingsPaginated as getBookRatingsPaginatedService } from "#services/ratingService.js";
 
 

@@ -2,15 +2,15 @@ import express from 'express';
 const router = express.Router();
 
 // USER routes
-import { UserBookRouter } from '#routes/Users/bookRoute.js';
-import { UserGenreRouter } from '#routes/Users/genreRoute.js';
-import { UserRouter } from '#routes/Users/userRoute.js';
-import { BookmarkRouter } from '#routes/Users/bookmarkRoute.js';
-import { AuthorRouter } from '#routes/Users/authorRoute.js';
+import { UserBookRouter } from '#routes/user/bookRoute.js';
+import { UserGenreRouter } from '#routes/user/genreRoute.js';
+import { UserRouter } from '#routes/user/userRoute.js';
+import { BookmarkRouter } from '#routes/user/bookmarkRoute.js';
+import { AuthorRouter } from '#routes//authorRoute.js';
 import { AuthRouter } from '#routes/authRoute.js';
 
 // ADMIN routes
-import { AdminRouter } from '#routes/Admin/AdminRoute.js';
+import { adminRouter } from '#routes/admin/AdminRoute.js';
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -28,6 +28,6 @@ router.use(AuthorRouter);
 router.use(AuthRouter);
 
 // Mount admin routes
-router.use(AdminRouter);
+router.use(adminRouter);
 
 export default router;
