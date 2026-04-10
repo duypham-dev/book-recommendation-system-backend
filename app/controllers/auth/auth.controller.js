@@ -4,7 +4,7 @@
  * Supports email/password and OAuth (Google) authentication
  */
 import { ApiResponse, logger } from "#utils/index.js";
-import { OAuth2Client } from 'google-auth-library';
+  import { OAuth2Client } from 'google-auth-library';
 import {
   signAccessToken,
   signRefreshToken,
@@ -31,8 +31,8 @@ const googleOAuthClient = new OAuth2Client({
   clientSecret: process.env.GOOGLE_WEB_SECRET,
 });
 
-/** Frontend URL for OAuth redirects */
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+  /** Frontend URL for OAuth redirects */
+  const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // =============================================================================
 // HELPER FUNCTIONS

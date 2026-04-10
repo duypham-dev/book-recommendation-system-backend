@@ -9,8 +9,13 @@ router.get('/authors', getAllAuthors);
 router.get('/authors/:authorId', getAuthorById);
 
 // Admin routes (require authentication)
-router.post('/admin/authors/create', authenticateToken, createAuthor);
-router.put('/admin/authors/update/:authorId', authenticateToken, updateAuthor);
-router.delete('/admin/authors/delete/:authorId', authenticateToken, deleteAuthor);
+router.use('/admin/authors', authenticateToken);
+
+router.route('/admin/authors')
+    .post(createAuthor);
+
+router.route('/admin/authors/:authorId')
+    .put(updateAuthor)
+    .delete(deleteAuthor);
 
 export { router as authorRouter };

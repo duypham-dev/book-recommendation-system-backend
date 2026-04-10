@@ -75,7 +75,6 @@ export const updateUserProfile = async (req, res) => {
       }
     }
 
-    logger.info(`Updating profile for user ${userId} with data: ${JSON.stringify(req.body)}`);
     // If no conflicts, call service to update
     const user = await userService.updateUserProfile(userId, {
       username,
