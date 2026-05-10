@@ -117,14 +117,43 @@ export const getUserRating = async (userId, bookId) => {
 };
 
 /**
+ * Get rating distribution (count + percentage per star 1-5) for a book.
+ * Returns an object keyed by star value: { 1: { count, percent }, ... }
+ */
+export const getRatingDistribution = async (bookId) => {
+  const [groups, total] = await Promise.all([
+    prisma.ratings.groupBy({
+      by: ['rating_value'],
+      where: { book_id: BigInt(bookId) },
+      _count: { rating_id: true },
+    }),
+    prisma.ratings.count({ where: { book_id: BigInt(bookId) } }),
+  ]);
+
+  // Initialise all stars to 0
+  const distribution = { 1: { count: 0, percent: 0 }, 2: { count: 0, percent: 0 }, 3: { count: 0, percent: 0 }, 4: { count: 0, percent: 0 }, 5: { count: 0, percent: 0 } };
+
+  for (const group of groups) {
+    const star = group.rating_value;
+    const count = group._count.rating_id;
+    distribution[star] = {
+      count,
+      percent: total > 0 ? Math.round((count / total) * 100) : 0,
+    };
+  }
+
+  return { distribution, total };
+};
+
+/**
  * Get paginated ratings for a book.
- * Returns raw Prisma entities + pagination metadata.
+ * Returns raw Prisma entities + pagination metadata + star distribution.
  */
 export const getBookRatingsPaginated = async (bookId, page = 0, size = 5) => {
   const where = { book_id: BigInt(bookId) };
   const skip = page * size;
 
-  const [ratings, total] = await Promise.all([
+  const [ratings, total, groups] = await Promise.all([
     prisma.ratings.findMany({
       where,
       orderBy: { created_at: 'desc' },
@@ -142,12 +171,29 @@ export const getBookRatingsPaginated = async (bookId, page = 0, size = 5) => {
       },
     }),
     prisma.ratings.count({ where }),
+    prisma.ratings.groupBy({
+      by: ['rating_value'],
+      where,
+      _count: { rating_id: true },
+    }),
   ]);
+
+  // Build distribution map
+  const distribution = { 1: { count: 0, percent: 0 }, 2: { count: 0, percent: 0 }, 3: { count: 0, percent: 0 }, 4: { count: 0, percent: 0 }, 5: { count: 0, percent: 0 } };
+  for (const group of groups) {
+    const star = group.rating_value;
+    const count = group._count.rating_id;
+    distribution[star] = {
+      count,
+      percent: total > 0 ? Math.round((count / total) * 100) : 0,
+    };
+  }
 
   return {
     ratings,
     total,
     hasMore: skip + ratings.length < total,
+    distribution,
   };
 };
 
@@ -158,4 +204,5 @@ export const ratingService = {
   getAverageRating,
   getUserRating,
   getBookRatingsPaginated,
+  getRatingDistribution,
 };

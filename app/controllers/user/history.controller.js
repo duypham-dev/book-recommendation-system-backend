@@ -10,7 +10,7 @@ import { toHistoryPaginatedResponse, toHistoryActionResponse } from "#mappers/hi
 // ============================================
 
 /**
- * GET /users/:userId/history - Get reading history
+ * GET /users/history - Get reading history
  */
 export const getUserHistory = async (req, res) => {
   try {
@@ -31,7 +31,28 @@ export const getUserHistory = async (req, res) => {
 };
 
 /**
- * POST /users/:userId/books/:bookId/history - Record reading progress
+ * GET /users/books/:bookId/progress - Get reading progress for a specific book
+ */
+export const getBookProgress = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { bookId } = req.params;
+
+    const result = await historyService.getBookProgress(userId, bookId);
+
+    if (!result) {
+      return ApiResponse.success(res, { progress: 0 }, 'No progress found');
+    }
+
+    return ApiResponse.success(res, result, 'Book progress fetched successfully');
+  } catch (error) {
+    logger.error('Get book progress error:', error);
+    return ApiResponse.error(res, 'Failed to fetch book progress', 500);
+  }
+};
+
+/**
+ * POST /users/books/:bookId/history - Record reading progress
  */
 export const recordHistory = async (req, res) => {
   try {
@@ -39,11 +60,6 @@ export const recordHistory = async (req, res) => {
 
     const { bookId } = req.params;
     const { progress } = req.body;
-    
-    // Verify user owns this action
-    if (req.user.userId !== userId) {
-      return ApiResponse.error(res, 'Unauthorized', 403);
-    }
     
     // 1. Call service
     const result = await historyService.recordHistory(userId, bookId, progress);

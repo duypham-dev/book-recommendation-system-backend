@@ -58,6 +58,7 @@ export const getUserHistory = async (userId, page = 0, size = 10) => {
 
 /**
  * Record or update reading history
+ * Progress is monotonically increasing — never decreases.
  * Returns raw Prisma entity with isNew flag
  */
 export const recordHistory = async (userId, bookId, progress = null) => {
@@ -70,12 +71,16 @@ export const recordHistory = async (userId, bookId, progress = null) => {
   });
 
   if (existing) {
-    // Update existing entry
+    // Only advance progress — never allow it to decrease
+    const currentProgress = existing.progress ?? 0;
+    const newProgress =
+      progress !== null ? Math.max(currentProgress, progress) : currentProgress;
+
     const updated = await prisma.reading_history.update({
       where: { history_id: existing.history_id },
       data: {
         last_read_at: new Date(),
-        progress: progress !== null ? progress : existing.progress,
+        progress: newProgress,
       },
     });
 
@@ -87,7 +92,7 @@ export const recordHistory = async (userId, bookId, progress = null) => {
     data: {
       user_id: BigInt(userId),
       book_id: BigInt(bookId),
-      progress: progress || 0,
+      progress: progress ?? 0,
     },
   });
 
@@ -96,6 +101,7 @@ export const recordHistory = async (userId, bookId, progress = null) => {
 
 /**
  * Get reading progress for a specific book
+ * Returns null if no history entry exists
  */
 export const getBookProgress = async (userId, bookId) => {
   const history = await prisma.reading_history.findFirst({
@@ -111,7 +117,7 @@ export const getBookProgress = async (userId, bookId) => {
     id: history.history_id.toString(),
     bookId: history.book_id.toString(),
     lastReadAt: history.last_read_at,
-    progress: history.progress,
+    progress: history.progress ?? 0,
   };
 };
 

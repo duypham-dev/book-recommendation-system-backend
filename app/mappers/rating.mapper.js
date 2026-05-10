@@ -88,3 +88,33 @@ export const toAverageRatingResponse = (result) => {
     totalRatings: result._count?.rating_id || 0,
   };
 };
+
+/**
+ * Transform rating distribution map (from service) into a flat percent-only map.
+ * Input:  { 1: { count, percent }, 2: { count, percent }, ... }
+ * Output: { 1: 10, 2: 5, 3: 15, 4: 30, 5: 40 }  (integers, sum ≈ 100)
+ * @param {Object} distribution - Raw distribution from ratingService
+ * @returns {Object} Star → percent map
+ */
+export const toRatingDistributionResponse = (distribution) => {
+  if (!distribution) return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  return Object.fromEntries(
+    [1, 2, 3, 4, 5].map((star) => [star, distribution[star]?.percent ?? 0])
+  );
+};
+
+/**
+ * Build the full paginated ratings API payload.
+ * @param {Object} result   - Service result: { ratings, total, hasMore, distribution }
+ * @param {number} page
+ * @param {number} size
+ * @returns {Object}
+ */
+export const toPaginatedRatingResponse = (result, page, size) => ({
+  ratings: toRatingListResponse(result.ratings),
+  total: result.total,
+  hasMore: result.hasMore,
+  page,
+  size,
+  distribution: toRatingDistributionResponse(result.distribution),
+});

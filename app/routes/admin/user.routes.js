@@ -11,8 +11,8 @@ const router = express.Router();
 // ============================================
 router.get('/admin/users', authenticateToken, authorizeRole(ROLES.ADMIN), getAllUsers);
 
-router.patch('/users/:userId/ban', authenticateToken, banUser);
-router.patch('/users/:userId/unban', authenticateToken, unbanUser);
-router.patch('/users/ban', authenticateToken, banUsersBulk);
+router.patch('/users/:userId/ban', authenticateToken, authorizeRole(ROLES.ADMIN), banUser);
+router.patch('/users/:userId/unban', authenticateToken, authorizeRole(ROLES.ADMIN), unbanUser);
+router.patch('/users/ban', authenticateToken, authorizeRole(ROLES.ADMIN), banUsersBulk);
 
 export { router as userManagementRouter };

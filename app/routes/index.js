@@ -9,6 +9,7 @@ import { historyRouter } from '#routes/user/history.routes.js';
 import { profileRouter } from '#routes/user/profile.routes.js';
 import { ratingRouter } from '#routes/user/rating.routes.js';
 import { favoriteRouter } from '#routes/user/favorite.routes.js';
+import { userRecommendationRouter } from '#routes/user/recommendation.routes.js';
 import { AuthRouter } from '#routes/auth/auth.routes.js';
 
 // ADMIN routes
@@ -31,6 +32,7 @@ router.use(favoriteRouter);
 router.use(historyRouter);
 router.use(profileRouter);
 router.use(ratingRouter);
+router.use(userRecommendationRouter);
 
 // Mount auth routes
 router.use(AuthRouter);

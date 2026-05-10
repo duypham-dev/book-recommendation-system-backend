@@ -1,6 +1,6 @@
 import { ApiResponse, logger } from "#utils/index.js";
 import { toBookListResponse, toBookDetailResponse, toBookPreviewResponse, toBookSearchResponse } from "../../mappers/book.mapper.js";
-import { toRatingListResponse } from "../../mappers/rating.mapper.js";
+import { toPaginatedRatingResponse } from "../../mappers/rating.mapper.js";
 import {
     getBooksByGenre as getBooksByGenreService,
     getSameGenreBooks as getSameGenreBooksService,
@@ -214,13 +214,11 @@ const getBookRatingsPaginated = async (req, res) => {
 
     try {
         const result = await getBookRatingsPaginatedService(bookId, page, size);
-        return ApiResponse.success(res, {
-            ratings: toRatingListResponse(result.ratings),
-            total: result.total,
-            hasMore: result.hasMore,
-            page,
-            size,
-        }, 'Ratings fetched successfully');
+        return ApiResponse.success(
+            res,
+            toPaginatedRatingResponse(result, page, size),
+            'Ratings fetched successfully'
+        );
     } catch (err) {
         logger.error(`Error fetching ratings for book ${bookId}: ${err.message}`);
         return ApiResponse.error(res, 'Failed to fetch ratings', 500);
