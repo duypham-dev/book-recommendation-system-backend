@@ -15,24 +15,47 @@ import {
 import { getBookRatingsPaginated as getBookRatingsPaginatedService } from "#services/rating.service.js";
 
 
-// Controller to get all books with pagination
+// Controller to get all books with pagination, search, sort, and filter
 const getAllBooks = async (req, res) => {
-    // Extract pagination parameters
-    const { cursor } = req.query;
+    const { page = 0, size = 12, sort = 'newest', keyword = '', genreIds, authorIds } = req.query;
 
-    const cursorId = cursor ? parseInt(cursor, 10) : undefined;
-    console.log('query params:', req.query);
+    // Validate pagination
+    const pageNum = parseInt(page, 10);
+    const sizeNum = parseInt(size, 10);
+
+    if (Number.isNaN(pageNum) || pageNum < 0) {
+        return ApiResponse.error(res, 'Invalid page parameter', 400);
+    }
+    if (Number.isNaN(sizeNum) || sizeNum < 1 || sizeNum > 100) {
+        return ApiResponse.error(res, 'Invalid size parameter (1-100)', 400);
+    }
+
+    // Validate sort
+    const allowedSorts = ['newest', 'title-asc', 'title-desc'];
+    const validSort = allowedSorts.includes(sort) ? sort : 'newest';
+
+    // Parse comma-separated ID arrays
+    const parsedGenreIds = genreIds ? String(genreIds).split(',').map(Number).filter(n => !Number.isNaN(n)) : [];
+    const parsedAuthorIds = authorIds ? String(authorIds).split(',').map(Number).filter(n => !Number.isNaN(n)) : [];
+
     try {
-        const books = await getAllBooksService(cursorId);
+        const result = await getAllBooksService({
+            page: pageNum,
+            size: sizeNum,
+            sort: validSort,
+            keyword: keyword.trim(),
+            genreIds: parsedGenreIds,
+            authorIds: parsedAuthorIds,
+        });
 
-        logger.info(`Fetched ${books.data.length} books (cursor ${cursorId})`);
+        const booksResponse = toBookListResponse(result.data);
 
-        const booksResponse = toBookListResponse(books.data);
-        const responsePayload = {
+        logger.info(`Fetched ${result.data.length} books (page ${pageNum}, keyword "${keyword}")`);
+
+        return ApiResponse.success(res, {
             content: booksResponse,
-            nextCursor: books.nextCursor,
-        };
-        return ApiResponse.success(res, responsePayload, 'Books fetched successfully');
+            ...result.pagination,
+        }, 'Books fetched successfully');
     } catch (err) {
         logger.error(`Error fetching books: ${err.message}`);
         return ApiResponse.error(res, 'Failed to fetch books', 500);

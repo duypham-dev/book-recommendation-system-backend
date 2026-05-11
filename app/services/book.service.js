@@ -1,39 +1,92 @@
 import { prisma } from '#lib/prisma.js';
 import { generatePresignedUrl } from '#config/storageConfig.js';
 
-// Function to get all books with pagination
-const getAllBooks = async (cursorId) => {
-  const limit = 12;
-  
-  const books = await prisma.books.findMany({
-    take: limit,
-    skip: cursorId ? 1 : 0,
-    cursor: cursorId ? { book_id: cursorId } : undefined,
-    where: {
-      is_deleted: false,
-    },
-    include: {
-      book_authors: {
-        include: {
-          authors: true,
+/**
+ * Get all books with offset-based pagination, keyword search, sorting, and filtering.
+ *
+ * @param {Object}   options
+ * @param {number}   options.page      - Zero-based page index (default 0)
+ * @param {number}   options.size      - Items per page (default 12)
+ * @param {string}   options.sort      - Sort strategy: 'newest' | 'title-asc' | 'title-desc'
+ * @param {string}   options.keyword   - Search term matched against title & description
+ * @param {bigint[]} options.genreIds  - Filter by genre IDs (OR logic)
+ * @param {bigint[]} options.authorIds - Filter by author IDs (OR logic)
+ * @returns {{ data: Array, pagination: { page, size, total, totalPages } }}
+ */
+const getAllBooks = async ({ page = 0, size = 12, sort = 'newest', keyword = '', genreIds = [], authorIds = [] } = {}) => {
+  // Build WHERE clause
+  const where = { is_deleted: false };
+
+  if (keyword) {
+    where.OR = [
+      { title: { contains: keyword, mode: 'insensitive' } },
+      { description: { contains: keyword, mode: 'insensitive' } },
+    ];
+  }
+
+  if (genreIds.length > 0) {
+    where.book_genres = {
+      some: { genre_id: { in: genreIds.map(id => BigInt(id)) } },
+    };
+  }
+
+  if (authorIds.length > 0) {
+    where.book_authors = {
+      some: { author_id: { in: authorIds.map(id => BigInt(id)) } },
+    };
+  }
+
+  // Determine sort order
+  let orderBy;
+  switch (sort) {
+    case 'title-asc':
+      orderBy = { title: 'asc' };
+      break;
+    case 'title-desc':
+      orderBy = { title: 'desc' };
+      break;
+    case 'newest':
+    default:
+      orderBy = { created_at: 'desc' };
+      break;
+  }
+
+  const skip = page * size;
+
+  const [books, total] = await prisma.$transaction([
+    prisma.books.findMany({
+      where,
+      orderBy,
+      skip,
+      take: size,
+      select: {
+        book_id: true,
+        title: true,
+        cover_image_url: true,
+        publication_year: true,
+        description: true,
+        book_authors: {
+          select: {
+            authors: {
+              select: { author_id: true, author_name: true },
+            },
+          },
+        },
+        book_genres: {
+          select: {
+            genres: {
+              select: { genre_id: true, genre_name: true },
+            },
+          },
         },
       },
-    },
-    orderBy: {
-      book_id: 'asc',
-    },
-  })
+    }),
+    prisma.books.count({ where }),
+  ]);
 
-  // find the next cursor 
-  let nextCursor = null;
-  
-  if (books.length === limit) {
-    nextCursor = books[books.length - 1].book_id; 
-  }
-  console.log("nextCursor:", nextCursor);
   return {
     data: books,
-    nextCursor,
+    pagination: { page, size, total, totalPages: Math.ceil(total / size) },
   };
 }
 
