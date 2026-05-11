@@ -1,27 +1,4 @@
-/**
- * Email Worker — RabbitMQ Consumer
- *
- * This is a standalone process. Run it separately from the main API server:
- *
- *   node workers/email.worker.js
- *
- * It connects to RabbitMQ, listens on `email_queue`, and delegates each
- * message to the appropriate email-sending function in email.service.js.
- *
- * Supported job types (set in payload.type):
- *   - 'ACCOUNT_ACTIVATION'
- *   - 'PASSWORD_RESET'
- *
- * Message shape:
- *   {
- *     type: 'ACCOUNT_ACTIVATION' | 'PASSWORD_RESET',
- *     to: string,          // recipient email address
- *     url: string,         // the activation or reset URL
- *     jobId: string,       // unique ID for tracing / deduplication
- *     enqueuedAt: string,  // ISO timestamp when the job was published
- *   }
- */
-
+//Email Worker — RabbitMQ Consumer
 import 'dotenv/config';
 import { rabbitmq, QUEUES } from '../app/config/rabbitmq.js';
 import {

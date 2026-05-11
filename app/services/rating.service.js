@@ -2,16 +2,9 @@ import { prisma } from '#lib/prisma.js';
 
 /**
  * Rating Service
- * 
- * Best Practice: Service returns raw Prisma entities
- * Mapping to API response format is done in controller via mapper
- */
-
-/**
  * Get ratings for a book
  * If userId is '0' or null, return all ratings for the book
  * Otherwise, return only the user's rating
- * Returns raw Prisma entities with user relation
  */
 export const getBookRatings = async (userId, bookId) => {
   const where = { book_id: BigInt(bookId) };
