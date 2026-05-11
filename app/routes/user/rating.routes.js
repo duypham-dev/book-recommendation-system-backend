@@ -5,20 +5,26 @@ import {
   createOrUpdateRating,
   deleteRating,
   getAverageRating,
+  getMyRating
 } from '#controllers/user/rating.controller.js';
 
 
 const router = express.Router();
 
-// Get ratings for a book (userId='0' returns all ratings)
-router.get('/users/:userId/books/:bookId/ratings', getBookRatings);
+// Get ratings for a book
+router.get('/books/:bookId/ratings', getBookRatings);
 
 // Get average rating for a book
-router.get('/users/:userId/books/:bookId/average-rating', getAverageRating);
+router.get('/books/:bookId/average-rating', getAverageRating);
 
-// Ratings routes (create/update/delete require auth)
-router.post('/users/:userId/books/:bookId/ratings', authenticateToken, createOrUpdateRating);
-router.delete('/users/:userId/books/:bookId/ratings', authenticateToken, deleteRating);
+
+// AUTHENTICATED ROUTES
+// Get user's own rating for a book
+router.get('/books/:bookId/ratings/me', authenticateToken, getMyRating);
+
+//Create new or update user's rating for a book
+router.post('/books/:bookId/ratings', authenticateToken, createOrUpdateRating)
+      .delete('/books/:bookId/ratings', authenticateToken, deleteRating);
 
 
 export { router as ratingRouter };

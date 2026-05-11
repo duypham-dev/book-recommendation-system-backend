@@ -96,21 +96,6 @@ async function createSessionAndSetCookie(res, userId, metadata) {
 
 /**
  * POST /auth/google - Google OAuth Sign-In
- * 
- * Flow:
- * 1. Frontend uses Google Sign-In button (redirect mode)
- * 2. Google redirects to this endpoint with ID token
- * 3. Verify ID token with Google
- * 4. Find or create user in database
- * 5. Create session and redirect to frontend
- * 
- * Security:
- * - Validates CSRF token from Google
- * - Verifies ID token signature with Google
- * - Uses database user ID (not Google ID) for sessions
- * 
- * @param {Request} req - Express request with credential and g_csrf_token
- * @param {Response} res - Express response (redirects to frontend)
  */
 export const googleLogin = async (req, res) => {
   try {

@@ -15,10 +15,10 @@ import { toRatingListResponse, toRatingCreateResponse, toAverageRatingResponse }
  */
 export const getBookRatings = async (req, res) => {
   try {
-    const { userId, bookId } = req.params;
+    const { bookId } = req.params;
     
     // 1. Call service to get raw entities
-    const ratings = await ratingService.getBookRatings(userId, bookId);
+    const ratings = await ratingService.getBookRatings(null, bookId);
     
     // 2. Transform via mapper
     const response = toRatingListResponse(ratings);
@@ -31,18 +31,34 @@ export const getBookRatings = async (req, res) => {
 };
 
 /**
+ * GET /books/:bookId/ratings/me - Get user's rating for a book
+ */
+export const getMyRating = async (req, res) => {
+  try {
+    const { bookId } = req.params;
+    const userId = req.user.userId; // Lấy từ Token
+    
+    const ratings = await ratingService.getBookRatings(userId, bookId);
+    // Giả sử service trả về mảng, lấy phần tử đầu tiên
+    const myRating = ratings.length > 0 ? ratings[0] : null; 
+    
+    return ApiResponse.success(res, myRating, 'User rating fetched successfully');
+  } catch (error) {
+    logger.error('Get my rating error:', error);
+    return ApiResponse.error(res, 'Failed to fetch user rating', 500);
+  }
+};
+
+
+/**
  * POST /users/:userId/books/:bookId/ratings - Create or update rating
  */
 export const createOrUpdateRating = async (req, res) => {
   try {
-    const { userId, bookId } = req.params;
+    const { bookId } = req.params;
+    const userId = req.user.userId;
     const { value, comment } = req.body;
-    
-    // Verify user owns this action
-    if (req.user.userId !== userId) {
-      return ApiResponse.error(res, 'Unauthorized', 403);
-    }
-    
+
     if (!value || value < 1 || value > 5) {
       return ApiResponse.error(res, 'Rating value must be between 1 and 5', 400);
     }
