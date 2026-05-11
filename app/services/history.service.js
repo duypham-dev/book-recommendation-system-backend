@@ -2,9 +2,6 @@ import { prisma } from '#lib/prisma.js';
 
 /**
  * History Service
- * 
- * Best Practice: Service returns raw Prisma entities
- * Mapping to API response format is done in controller via mapper
  */
 
 /**

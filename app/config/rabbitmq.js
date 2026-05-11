@@ -9,30 +9,20 @@
 import amqplib from 'amqplib';
 import { logger } from '#utils/logger.js';
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
 
+// Constants
 /** Maximum number of reconnection retries before giving up. */
 const MAX_RETRIES = 10;
-
 /** Base delay (ms) for exponential backoff: delay = BASE_DELAY * 2^retry */
 const BASE_DELAY_MS = 500;
-
 /** Maximum reconnection delay cap (ms). */
 const MAX_DELAY_MS = 30_000;
 
-// ---------------------------------------------------------------------------
 // Queue / Exchange Definitions
-// ---------------------------------------------------------------------------
 
 /**
  * Central registry of all queue names used in this application.
  * Import this object everywhere instead of using raw strings to avoid typos.
- *
- * @example
- * import { QUEUES } from '#config/rabbitmq.js';
- * await rabbitmq.publish(QUEUES.EMAIL, payload);
  */
 export const QUEUES = {
   EMAIL: 'email_queue',
