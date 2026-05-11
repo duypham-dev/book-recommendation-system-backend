@@ -1,9 +1,10 @@
 import { prisma } from '#lib/prisma.js';
 import { hashPassword } from '#utils/hashPassword.js';
 import { logger } from '#utils/index.js';
-import { sendPasswordResetEmail } from './email.service.js';
+import { rabbitmq, QUEUES } from '#config/rabbitmq.js';
 import { TOKEN_TYPES, TOKEN_BYTES, RESET_TOKEN_EXPIRY_MINUTES } from '../constants/tokenTypes.js';
 import { generateToken, hashToken } from '../utils/token.util.js';
+import { randomUUID } from 'crypto';
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
@@ -66,9 +67,17 @@ export async function requestPasswordReset(email) {
 
   const resetUrl = `${FRONTEND_URL}/reset-password?token=${plainToken}`;
 
-  await sendPasswordResetEmail(email, resetUrl);
+  // Publish to RabbitMQ — the email.worker.js process will pick this up
+  // and call sendPasswordResetEmail() asynchronously.
+  rabbitmq.publish(QUEUES.EMAIL, {
+    type: 'PASSWORD_RESET',
+    to: email,
+    url: resetUrl,
+    jobId: randomUUID(),
+    enqueuedAt: new Date().toISOString(),
+  });
 
-  logger.info('Password reset token generated', { email, expiresAt: expiry.toISOString() });
+  logger.info('Password reset email job enqueued', { email, expiresAt: expiry.toISOString() });
 }
 
 /**

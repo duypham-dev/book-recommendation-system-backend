@@ -19,6 +19,7 @@
     "dev": "nodemon server.js",
     "build": "prisma generate",
     "start": "node server.js",
+    "worker:email": "node workers/email.worker.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
@@ -33,6 +34,7 @@
     "@google-cloud/storage": "^7.18.0",
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
+    "amqplib": "^2.0.1",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.9.0",
     "cookie-parser": "^1.4.7",

@@ -1,16 +1,21 @@
 import app from './app/index.js';
 import { redisClient } from './app/config/redis.js';
+import { rabbitmq } from './app/config/rabbitmq.js';
 
 const port = process.env.PORT || 8080;
 
 // Initialize services and start server
 async function startServer() {
   try {
-    // Connect to Redis before starting the server
+    // 1. Connect to Redis
     await redisClient.connect();
     console.log('✓ Redis connected');
-    
-    // Start Express server
+
+    // 2. Connect to RabbitMQ (publisher only — workers run as separate processes)
+    await rabbitmq.connect();
+    console.log('✓ RabbitMQ connected');
+
+    // 3. Start Express server
     app.listen(port, () => {
       console.log(`✓ Server running at http://localhost:${port}`);
     });
@@ -20,17 +25,18 @@ async function startServer() {
   }
 }
 
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM received, shutting down...');
-  await redisClient.disconnect();
-  process.exit(0);
-});
+// ---------------------------------------------------------------------------
+// Graceful Shutdown
+// ---------------------------------------------------------------------------
 
-process.on('SIGINT', async () => {
-  console.log('SIGINT received, shutting down...');
+async function shutdown(signal) {
+  console.log(`\n${signal} received, shutting down gracefully…`);
+  await rabbitmq.disconnect();
   await redisClient.disconnect();
   process.exit(0);
-});
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT',  () => shutdown('SIGINT'));
 
 startServer();

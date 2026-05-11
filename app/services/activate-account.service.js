@@ -1,8 +1,9 @@
 import { prisma } from '#lib/prisma.js';
 import { logger } from '#utils/index.js';
-import { sendAccountActivationEmail } from './email.service.js';
+import { rabbitmq, QUEUES } from '#config/rabbitmq.js';
 import { TOKEN_TYPES, TOKEN_BYTES, ACTIVATE_TOKEN_EXPIRY_MINUTES } from '../constants/tokenTypes.js';
 import { generateToken, hashToken } from '../utils/token.util.js';
+import { randomUUID } from 'crypto';
 
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
@@ -47,8 +48,18 @@ export async function sendActivationLink(email) {
     });
 
     const activationLink = `${FRONTEND_URL}/activate-account?token=${plainToken}`;
-    await sendAccountActivationEmail(email, activationLink);
-    logger.info('Account activation email sent', { to: email });
+
+    // Publish to RabbitMQ — the email.worker.js process will pick this up
+    // and call sendAccountActivationEmail() asynchronously.
+    rabbitmq.publish(QUEUES.EMAIL, {
+      type: 'ACCOUNT_ACTIVATION',
+      to: email,
+      url: activationLink,
+      jobId: randomUUID(),
+      enqueuedAt: new Date().toISOString(),
+    });
+
+    logger.info('Account activation email job enqueued', { to: email });
 }
 
 /**
