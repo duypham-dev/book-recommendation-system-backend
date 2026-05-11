@@ -109,31 +109,3 @@ export const getDiverseBooks = async (bookId, limit = 5) => {
   }
 };
 
-export const sendFeedback = async (userId, feedbackData) => {
-  try {
-    const recommendationUrl = process.env.RECOMMENDATION_SERVICE_URL || 'http://localhost:8003';
-    
-    const payload = {
-      user_id: userId,
-      book_id: feedbackData.book_id,
-      event: feedbackData.event,
-      rating_value: feedbackData.rating_value,
-      progress: feedbackData.progress
-    };
-
-    const response = await fetch(`${recommendationUrl}/api/v1/feedback`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    
-    if (!response.ok) {
-      throw new AppError('Failed to send feedback to Suggestion Engine', response.status);
-    }
-    
-    return await response.json();
-  } catch (error) {
-    if (error instanceof AppError) throw error;
-    throw new AppError(`Feedback error: ${error.message}`, 500);
-  }
-};

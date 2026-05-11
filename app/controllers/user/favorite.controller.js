@@ -1,5 +1,6 @@
 import { ApiResponse, logger } from "#utils/index.js";
 import { favoriteService } from "#services/favorite.service.js";
+import { publishFeedback } from '../../publishers/recommendation.publisher.js';
 
 // Import mappers
 import { toFavoriteActionResponse, toFavoritePaginatedResponse } from "#mappers/favorite.mapper.js";
@@ -53,6 +54,9 @@ export const addFavorite = async (req, res) => {
       return ApiResponse.success(res, response, 'Book already in favorites');
     }
     
+    // Publish favorite event to RS (fire-and-forget, strength=5)
+    publishFeedback(userId, { bookId, event: 'favorite', ratingValue: 5 });
+    
     return ApiResponse.created(res, response, 'Added to favorites');
   } catch (error) {
     logger.error('Add favorite error:', error);
@@ -78,6 +82,9 @@ export const removeFavorite = async (req, res) => {
     if (!removed) {
       return ApiResponse.error(res, 'Favorite not found', 404);
     }
+    
+    // Publish unfavorite event to RS (fire-and-forget, strength=0 signals removal)
+    publishFeedback(userId, { bookId, event: 'favorite', ratingValue: 0 });
     
     return ApiResponse.success(res, null, 'Removed from favorites');
   } catch (error) {

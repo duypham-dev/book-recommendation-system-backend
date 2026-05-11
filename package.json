@@ -20,6 +20,7 @@
     "build": "prisma generate",
     "start": "node server.js",
     "worker:email": "node workers/email.worker.js",
+    "worker:cache": "node workers/cache-invalidation.worker.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"

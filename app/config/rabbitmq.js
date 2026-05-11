@@ -26,6 +26,9 @@ const MAX_DELAY_MS = 30_000;
  */
 export const QUEUES = {
   EMAIL: 'email_queue',
+  RS_FEEDBACK: 'rs_feedback_queue',
+  RS_RETRAIN: 'rs_retrain_queue',
+  CACHE_INVALIDATION: 'cache_invalidation_queue',
 };
 
 // ---------------------------------------------------------------------------

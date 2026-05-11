@@ -1,5 +1,6 @@
 import { ApiResponse, logger } from "#utils/index.js";
 import { historyService } from "#services/history.service.js";
+import { publishFeedback } from '../../publishers/recommendation.publisher.js';
 
 // Import mappers
 import { toHistoryPaginatedResponse, toHistoryActionResponse } from "#mappers/history.mapper.js";
@@ -64,7 +65,10 @@ export const recordHistory = async (req, res) => {
     // 1. Call service
     const result = await historyService.recordHistory(userId, bookId, progress);
     
-    // 2. Transform via mapper
+    // 2. Publish history event to RS (fire-and-forget)
+    publishFeedback(userId, { bookId, event: 'history', progress });
+    
+    // 3. Transform via mapper
     const response = toHistoryActionResponse(result.entity, result.isNew);
     
     return ApiResponse.success(res, response, 'Reading progress recorded');

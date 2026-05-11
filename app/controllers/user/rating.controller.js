@@ -1,5 +1,6 @@
 import { ApiResponse, logger } from "#utils/index.js";
 import { ratingService } from "#services/rating.service.js";
+import { publishFeedback } from '../../publishers/recommendation.publisher.js';
 
 // Import mappers
 import { toRatingListResponse, toRatingCreateResponse, toAverageRatingResponse } from "#mappers/rating.mapper.js";
@@ -49,7 +50,10 @@ export const createOrUpdateRating = async (req, res) => {
     // 1. Call service
     const result = await ratingService.createOrUpdateRating(userId, bookId, value, comment);
     
-    // 2. Transform via mapper
+    // 2. Publish feedback event to RS (fire-and-forget)
+    publishFeedback(userId, { bookId, event: 'rating', ratingValue: value });
+    
+    // 3. Transform via mapper
     const response = toRatingCreateResponse(result.entity, result.isNew);
     
     return ApiResponse.success(res, response, result.isNew ? 'Rating created' : 'Rating updated');
@@ -76,6 +80,9 @@ export const deleteRating = async (req, res) => {
     if (!deleted) {
       return ApiResponse.error(res, 'Rating not found', 404);
     }
+    
+    // Publish rating removal event to RS (strength 0 signals deletion)
+    publishFeedback(userId, { bookId, event: 'rating', ratingValue: 0 });
     
     return ApiResponse.success(res, null, 'Rating deleted');
   } catch (error) {
