@@ -35,6 +35,8 @@ const mapBaseBookFields = (book) => ({
   coverImageUrl: book.cover_image_url,
   publicationYear: book.publication_year,
   authors: mapAuthors(book.book_authors),
+  isFav: book.isFav ?? false,
+  description: book.description,
 });
 
 /**

@@ -9,7 +9,6 @@ export const getBookRecommendations = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
     
     const recommendations = await recommendationService.getRecommendations(userId, limit);
-    console.log("RECOMMENDATION: ", recommendations);
     ApiResponse.success(res, toBookListResponse(recommendations), 'Recommendations fetched successfully');
   } catch (error) {
     next(error);

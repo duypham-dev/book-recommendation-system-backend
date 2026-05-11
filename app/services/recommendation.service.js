@@ -36,9 +36,28 @@ export const getRecommendations = async (userId, limit = 10) => {
       },
     });
 
+    let favoritedBookIds = new Set();
+    if (userId) {
+      const favorites = await prisma.favorites.findMany({
+        where: {
+          user_id: BigInt(userId),
+          book_id: { in: recommendedBookIds }
+        },
+        select: { book_id: true }
+      });
+      favorites.forEach(f => favoritedBookIds.add(f.book_id.toString()));
+    }
+
     // 4. Sort books to match the order from recommendation engine
     const sortedBooks = recommendedBookIds
-      .map(id => books.find(book => book.book_id === id))
+      .map(id => {
+         const book = books.find(book => book.book_id === id);
+         if (book) {
+            book.isFav = favoritedBookIds.has(book.book_id.toString());
+            return book;
+         }
+         return undefined;
+      })
       .filter(book => book !== undefined);
 
     return sortedBooks;
