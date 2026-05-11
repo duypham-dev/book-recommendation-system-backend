@@ -14,7 +14,7 @@ export const getRecommendations = async (userId, limit = 10) => {
     }
     
     const data = await response.json();
-    const recommendedBookIds = (data.items || data.results || []).map(item => item.book_id);
+    const recommendedBookIds = (data.items || data.results || []).map(item => BigInt(item.book_id));
     
     // 2. If no books returned, return empty array
     if (!recommendedBookIds || recommendedBookIds.length === 0) {
@@ -59,7 +59,7 @@ export const getSimilarBooks = async (bookId, limit = 10) => {
     
     const data = await response.json();
 
-    const similarBookIds = (data.items || data.results || []).map(item => item.book_id);
+    const similarBookIds = (data.items || data.results || []).map(item => BigInt(item.book_id));
     
     if (!similarBookIds.length) return [];
 
@@ -88,7 +88,7 @@ export const getDiverseBooks = async (bookId, limit = 5) => {
     }
     
     const data = await response.json();
-    const diverseBookIds = (data.items || data.results || []).map(item => item.book_id);
+    const diverseBookIds = (data.items || data.results || []).map(item => BigInt(item.book_id));
     
     if (!diverseBookIds.length) return [];
 

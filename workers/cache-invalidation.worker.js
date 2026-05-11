@@ -82,12 +82,12 @@ const JOB_HANDLERS = {
  */
 async function scanKeys(client, pattern) {
   const found = [];
-  let cursor = 0;
+  let cursor = '0';
   do {
     const result = await client.scan(cursor, { MATCH: pattern, COUNT: 100 });
     cursor = result.cursor;
     found.push(...result.keys);
-  } while (cursor !== 0);
+  } while (cursor !== '0');
   return found;
 }
 
