@@ -15,8 +15,9 @@ import { toBookmarkListResponse, toBookmarkResponse } from "#mappers/bookmark.ma
  */
 export const getBookmarks = async (req, res) => {
   try {
-    const { userId, bookId } = req.params;
-    
+    const { userId } = req.user;
+    const { bookId } = req.params;
+
     // 1. Call service to get raw entities
     const bookmarks = await bookmarkService.getBookmarks(userId, bookId);
     
@@ -35,13 +36,10 @@ export const getBookmarks = async (req, res) => {
  */
 export const createBookmark = async (req, res) => {
   try {
-    const { userId, bookId } = req.params;
+    const { bookId } = req.params;
+    const { userId } = req.user;
+
     const { pageNumber, locationInBook, note } = req.body;
-    
-    // Verify user owns this action
-    if (req.user.userId !== userId) {
-      return ApiResponse.error(res, 'Unauthorized', 403);
-    }
     
     // 1. Call service
     const bookmark = await bookmarkService.createBookmark(userId, bookId, {
@@ -65,16 +63,13 @@ export const createBookmark = async (req, res) => {
  */
 export const updateBookmark = async (req, res) => {
   try {
-    const { userId, bookmarkId } = req.params;
+    const { bookmarkId } = req.params;
+    const { userId } = req.user;
+
     const { pageNumber, locationInBook, note } = req.body;
     
-    // Verify user owns this action
-    if (req.user.userId !== userId) {
-      return ApiResponse.error(res, 'Unauthorized', 403);
-    }
-    
     // 1. Call service
-    const bookmark = await bookmarkService.updateBookmark(bookmarkId, {
+    const bookmark = await bookmarkService.updateBookmark(userId, bookmarkId, {
       pageNumber,
       locationInBook,
       note,
@@ -95,14 +90,10 @@ export const updateBookmark = async (req, res) => {
  */
 export const deleteBookmark = async (req, res) => {
   try {
-    const { userId, bookmarkId } = req.params;
+    const { bookmarkId } = req.params;
+    const { userId } = req.user;
     
-    // Verify user owns this action
-    if (req.user.userId !== userId) {
-      return ApiResponse.error(res, 'Unauthorized', 403);
-    }
-    
-    await bookmarkService.deleteBookmark(bookmarkId);
+    await bookmarkService.deleteBookmark(userId, bookmarkId);
     
     return ApiResponse.success(res, null, 'Bookmark deleted');
   } catch (error) {

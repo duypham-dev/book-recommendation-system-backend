@@ -41,15 +41,15 @@ export const createBookmark = async (userId, bookId, data) => {
  * Update a bookmark
  * Returns raw Prisma entity
  */
-export const updateBookmark = async (bookmarkId, data) => {
+export const updateBookmark = async (userId, bookmarkId, data) => {
   const updateData = {};
-  
+
   if (data.pageNumber !== undefined) updateData.page_number = data.pageNumber;
   if (data.locationInBook !== undefined) updateData.location_in_book = data.locationInBook;
   if (data.note !== undefined) updateData.note = data.note;
 
   return prisma.bookmarks.update({
-    where: { bookmark_id: BigInt(bookmarkId) },
+    where: { bookmark_id: BigInt(bookmarkId), user_id: BigInt(userId) },
     data: updateData,
   });
 };
@@ -57,9 +57,9 @@ export const updateBookmark = async (bookmarkId, data) => {
 /**
  * Delete a bookmark
  */
-export const deleteBookmark = async (bookmarkId) => {
+export const deleteBookmark = async (userId, bookmarkId) => {
   await prisma.bookmarks.delete({
-    where: { bookmark_id: BigInt(bookmarkId) },
+    where: { bookmark_id: BigInt(bookmarkId), user_id: BigInt(userId) },
   });
   return true;
 };

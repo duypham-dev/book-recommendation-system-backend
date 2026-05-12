@@ -17,7 +17,6 @@ router.get('/books/:bookId/ratings', getBookRatings);
 // Get average rating for a book
 router.get('/books/:bookId/average-rating', getAverageRating);
 
-
 // AUTHENTICATED ROUTES
 // Get user's own rating for a book
 router.get('/books/:bookId/ratings/me', authenticateToken, getMyRating);
