@@ -96,35 +96,3 @@ export const getSimilarBooks = async (bookId, limit = 10) => {
     throw new AppError(`Similar books error: ${error.message}`, 500);
   }
 };
-
-export const getDiverseBooks = async (bookId, limit = 5) => {
-  try {
-    const recommendationUrl = process.env.RECOMMENDATION_SERVICE_URL || 'http://localhost:8003';
-    const response = await fetch(`${recommendationUrl}/api/v1/diversity?book_id=${bookId}&limit=${limit}`);
-    
-    if (!response.ok) {
-      throw new AppError('Failed to fetch diverse books from Suggestion Engine', response.status);
-    }
-    
-    const data = await response.json();
-    const diverseBookIds = (data.items || data.results || []).map(item => BigInt(item.book_id));
-    
-    if (!diverseBookIds.length) return [];
-
-    const books = await prisma.books.findMany({
-      where: {
-        book_id: { in: diverseBookIds },
-        is_deleted: false,
-      },
-      include: { book_authors: { include: { authors: true } } },
-    });
-
-    return diverseBookIds
-      .map(id => books.find(book => book.book_id === id))
-      .filter(book => book !== undefined);
-  } catch (error) {
-    if (error instanceof AppError) throw error;
-    throw new AppError(`Diverse books error: ${error.message}`, 500);
-  }
-};
-

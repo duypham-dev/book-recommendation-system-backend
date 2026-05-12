@@ -18,6 +18,7 @@ import { adminBookRouter } from '#routes/admin/book.routes.js';
 import { adminGenreRouter } from '#routes/admin/genre.routes.js';
 import { userManagementRouter } from '#routes/admin/user.routes.js';
 import { dashboardRouter } from '#routes/admin/dashboard.routes.js';
+import { adminRecommendationRouter } from '#routes/admin/recommendation.routes.js';
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -43,5 +44,6 @@ router.use(adminBookRouter);
 router.use(adminGenreRouter);
 router.use(userManagementRouter);
 router.use(dashboardRouter);
+router.use(adminRecommendationRouter);
 
 export default router;
