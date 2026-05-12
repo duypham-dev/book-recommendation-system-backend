@@ -7,13 +7,10 @@ import crypto from 'crypto';
 import "dotenv/config";
 
 // Token expiration times
-// IMPORTANT: Use string format with explicit unit suffix so the `ms` library
-// inside jsonwebtoken never misinterprets a bare number-string as milliseconds.
-// e.g. "60" (string) → 60 ms !!  vs  "2m" → 2 minutes  vs  120 (number) → 120 s
 export const TOKEN_EXPIRY = {
-  ACCESS: "2m",                // 2 minutes  (string with unit → ms library parses correctly)
+  ACCESS: "15m",                // 15 minutes
   REFRESH: "7d",               // 7 days
-  ACCESS_SECONDS: 2 * 60,     // numeric form for non-jwt uses (cookie maxAge, frontend hint)
+  ACCESS_SECONDS: 15 * 60,
   REFRESH_SECONDS: 7 * 24 * 60 * 60,
 };
 
@@ -30,18 +27,11 @@ export function generateJti() {
 export function signAccessToken(user) {
   const jti = generateJti();
 
-  // const payload = {
-  //   userId: user.userId,
-  //   email: user.email,
-  //   fullName: user.fullName,
-  //   role: user.role,
-  // };
-
   const accessToken = jwt.sign(
     user,
     process.env.JWT_ACCESS_SECRECT,
     {
-      expiresIn: TOKEN_EXPIRY.ACCESS, // "2m" string with unit — safe from ms() misparse
+      expiresIn: TOKEN_EXPIRY.ACCESS,
       subject: String(user.userId),
       issuer: "tekbook-api",
       audience: "tekbook-client",
@@ -63,7 +53,7 @@ export function signRefreshToken(userId) {
     { type: 'refresh' },
     process.env.JWT_REFRESH_SECRECT,
     {
-      expiresIn: TOKEN_EXPIRY.REFRESH, // "7d" string with unit
+      expiresIn: TOKEN_EXPIRY.REFRESH,
       subject: String(userId),
       issuer: "tekbook-api",
       audience: "tekbook-client",

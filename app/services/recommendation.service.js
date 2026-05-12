@@ -1,5 +1,5 @@
 import { prisma } from '#lib/prisma.js';
-import { AppError } from '#utils/error.js';
+import { AppError, NotFoundError } from '#utils/error.js';
 import { redisClient } from '#config/redis.js';
 import { logger } from '#utils/logger.js';
 
@@ -28,12 +28,17 @@ const fetchFromRSWithCache = async (cacheKey, url) => {
 
   // 2. Cache miss, fetch from RS
   logger.debug(`[Cache Miss] Fetching from RS: ${url}`);
-  const response = await fetch(url);
-  
-  if (!response.ok) {
-    throw new AppError('Failed to fetch data from Suggestion Engine', response.status);
+  let response;
+  try {
+    response = await fetch(url);
+  } catch (error) {
+    throw new NotFoundError('Failed to fetch data from Suggestion Engine');
   }
   
+  if (!response.ok) {
+    throw new NotFoundError('Failed to fetch data from Suggestion Engine');
+  }
+
   const data = await response.json();
   const items = data.items || data.results || [];
 
@@ -46,7 +51,6 @@ const fetchFromRSWithCache = async (cacheKey, url) => {
   } catch (err) {
     logger.warn(`[Redis Error] Failed to set cache for ${cacheKey}: ${err.message}`);
   }
-
   return items;
 };
 
@@ -109,8 +113,7 @@ export const getRecommendations = async (userId, limit = 10) => {
 
     return sortedBooks;
   } catch (error) {
-    if (error instanceof AppError) throw error;
-    throw new AppError(`Recommendation error: ${error.message}`, 500);
+    throw error;
   }
 };
 
@@ -143,7 +146,6 @@ export const getSimilarBooks = async (bookId, limit = 10) => {
 
     return sortedBooks;
   } catch (error) {
-    if (error instanceof AppError) throw error;
-    throw new AppError(`Similar books error: ${error.message}`, 500);
+    throw error;
   }
 };
