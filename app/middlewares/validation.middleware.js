@@ -39,7 +39,11 @@ export const validate = (schema, property = 'body') => {
       }
       
       // Update request with validated and cleaned data
-      req[property] = value;
+      if (property === 'query') {
+        Object.assign(req.query, value);
+      } else {
+        req[property] = value;
+      }
       
       logger.debug('Validation passed', {
         property,
@@ -101,7 +105,11 @@ export const validateMultiple = (schemas) => {
       
       // Update request with validated data
       Object.entries(validatedData).forEach(([property, value]) => {
-        req[property] = value;
+        if (property === 'query') {
+          Object.assign(req.query, value);
+        } else {
+          req[property] = value;
+        }
       });
       
       logger.debug('Multiple validation passed', validatedData);

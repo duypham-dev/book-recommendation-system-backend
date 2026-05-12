@@ -1,4 +1,17 @@
 import express from 'express';
+import { validate, validateMultiple } from '#middlewares/validation.middleware.js';
+import {
+    bookIdParamsSchema,
+    booksByGenreParamsSchema,
+    booksByGenreQuerySchema,
+    booksListQuerySchema,
+    booksSearchQuerySchema,
+    bookRatingsQuerySchema,
+    sameGenreQuerySchema,
+    downloadBookParamsSchema,
+    mostReadQuerySchema
+} from '#validators/book.validator.js';
+
 import {
     getBooksByGenre,
     getSameGenreBooks,
@@ -14,17 +27,26 @@ import {
 
 const router = express.Router();
 
-router.get('/books/most-read', getMostReadBooks);
-router.get('/books/search', getBookByKeyword);
-router.get('/books/genre/:genreId', getBooksByGenre);
-router.get('/books', getAllBooks);
+router.get('/books/most-read', validate(mostReadQuerySchema, 'query'), getMostReadBooks);
+router.get('/books/search', validate(booksSearchQuerySchema, 'query'), getBookByKeyword);
+router.get('/books/genre/:genreId',
+    validateMultiple({ params: booksByGenreParamsSchema, query: booksByGenreQuerySchema }),
+    getBooksByGenre
+);
+router.get('/books', validate(booksListQuerySchema, 'query'), getAllBooks);
 
 // Dynamic routes with :bookId — sub-resource routes must precede the bare /:bookId route
-router.get('/books/:bookId/same-genre', getSameGenreBooks);
-router.get('/books/:bookId/read-url', getBookReadUrl);
-router.get('/books/:bookId/download/:formatId', downloadBook);
-router.get('/books/:bookId/preview', getBookPreview);
-router.get('/books/:bookId/ratings', getBookRatingsPaginated);
-router.get('/books/:bookId', getBookById);
+router.get('/books/:bookId/same-genre',
+    validateMultiple({ params: bookIdParamsSchema, query: sameGenreQuerySchema }),
+    getSameGenreBooks
+);
+router.get('/books/:bookId/read-url', validate(bookIdParamsSchema, 'params'), getBookReadUrl);
+router.get('/books/:bookId/download/:formatId', validate(downloadBookParamsSchema, 'params'), downloadBook);
+router.get('/books/:bookId/preview', validate(bookIdParamsSchema, 'params'), getBookPreview);
+router.get('/books/:bookId/ratings',
+    validateMultiple({ params: bookIdParamsSchema, query: bookRatingsQuerySchema }),
+    getBookRatingsPaginated
+);
+router.get('/books/:bookId', validate(bookIdParamsSchema, 'params'), getBookById);
 
-export {router as userBookRouter};
+export { router as userBookRouter };

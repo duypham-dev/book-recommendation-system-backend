@@ -19,16 +19,8 @@ import { getBookRatingsPaginated as getBookRatingsPaginatedService } from "#serv
 const getAllBooks = async (req, res) => {
     const { page = 0, size = 12, sort = 'newest', keyword = '', genreIds, authorIds } = req.query;
 
-    // Validate pagination
     const pageNum = parseInt(page, 10);
     const sizeNum = parseInt(size, 10);
-
-    if (Number.isNaN(pageNum) || pageNum < 0) {
-        return ApiResponse.error(res, 'Invalid page parameter', 400);
-    }
-    if (Number.isNaN(sizeNum) || sizeNum < 1 || sizeNum > 100) {
-        return ApiResponse.error(res, 'Invalid size parameter (1-100)', 400);
-    }
 
     // Validate sort
     const allowedSorts = ['newest', 'title-asc', 'title-desc'];
@@ -69,9 +61,6 @@ const getBookById = async (req, res) => {
     const { bookId } = req.params;
     const userId = req.query.userId; // Optional userId for personalized details
 
-    // Validate bookId
-    if (!bookId) { return ApiResponse.error(res, 'Book ID is required', 400); }
-
     try {
         const book = await getBookByIdService(bookId, userId);
         
@@ -92,18 +81,8 @@ const getBooksByGenre = async (req, res) => {
     const { genreId } = req.params;
     const { page = 0, size = 10, sort = 'newest' } = req.query;
 
-    // Validate genreId
-    if (!genreId) { return ApiResponse.error(res, 'Genre ID is required', 400); }
-
     const pageNum = parseInt(page);
     const sizeNum = parseInt(size);
-
-    if (Number.isNaN(pageNum) || pageNum < 0) {
-        return ApiResponse.error(res, 'Invalid page parameter', 400);
-    }
-    if (Number.isNaN(sizeNum) || sizeNum < 1 || sizeNum > 100) {
-        return ApiResponse.error(res, 'Invalid size parameter (1-100)', 400);
-    }
 
     const allowedSorts = ['newest', 'popular', 'title-asc', 'title-desc'];
     const validSort = allowedSorts.includes(sort) ? sort : 'newest';
@@ -149,8 +128,6 @@ const getMostReadBooks = async (req, res) => {
 const getBookPreview = async (req, res) => {
     const { bookId } = req.params;
 
-    if (!bookId) { return ApiResponse.error(res, 'Book ID is required', 400); }
-
     try {
         const book = await getBookPreviewService(bookId);
         
@@ -169,10 +146,6 @@ const getBookPreview = async (req, res) => {
 const getBookByKeyword = async (req, res) => {
     const {keyword , page = 0, size = 10} = req.query;
 
-    if (!keyword || Number.isNaN(parseInt(page)) || Number.isNaN(parseInt(size))) {
-        return ApiResponse.error(res, 'query params are invalid', 400);
-    }
-
     try{
         const books = await getBookByKeywordService(keyword, parseInt(page), parseInt(size));
         const booksResponse = toBookSearchResponse(books);
@@ -188,8 +161,6 @@ const getBookByKeyword = async (req, res) => {
 const getBookReadUrl = async (req, res) => {
     const { bookId } = req.params;
     const { format = 'EPUB' } = req.query;
-
-    if (!bookId) { return ApiResponse.error(res, 'Book ID is required', 400); }
 
     try {
         const result = await getBookReadUrlService(bookId, format);
@@ -209,10 +180,6 @@ const getBookReadUrl = async (req, res) => {
 const downloadBook = async (req, res) => {
     const { bookId, formatId } = req.params;
 
-    if (!bookId || !formatId) {
-        return ApiResponse.error(res, 'Book ID and format ID are required', 400);
-    }
-
     try {
         const result = await getBookDownloadUrlService(bookId, formatId);
 
@@ -230,8 +197,6 @@ const downloadBook = async (req, res) => {
 // Controller to get paginated ratings for a book
 const getBookRatingsPaginated = async (req, res) => {
     const { bookId } = req.params;
-    if (!bookId) return ApiResponse.error(res, 'Book ID is required', 400);
-
     const page = Math.max(0, parseInt(req.query.page) || 0);
     const size = Math.min(20, Math.max(1, parseInt(req.query.size) || 5));
 
@@ -259,8 +224,6 @@ const getBookRatingsPaginated = async (req, res) => {
  */
 const getSameGenreBooks = async (req, res) => {
     const { bookId } = req.params;
-    if (!bookId) return ApiResponse.error(res, 'Book ID is required', 400);
-
     const limit = Math.min(20, Math.max(1, parseInt(req.query.limit) || 6));
 
     try {
