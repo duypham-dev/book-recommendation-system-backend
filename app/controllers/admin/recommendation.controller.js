@@ -64,9 +64,9 @@ const getRedis = () => redisClient.getClient();
 // ─────────────────────────────────────────────
 const countKeysByPrefix = async (redis, prefix) => {
   let count = 0;
-  // scanIterator tự quản lý cursor, không cần vòng do-while thủ công
-  for await (const _key of redis.scanIterator({ MATCH: `${prefix}*`, COUNT: 100 })) {
-    count++;
+  // scanIterator có thể trả về string hoặc array các string tùy phiên bản
+  for await (const chunk of redis.scanIterator({ MATCH: `${prefix}*`, COUNT: 100 })) {
+    count += Array.isArray(chunk) ? chunk.length : 1;
   }
   return count;
 };
@@ -76,8 +76,12 @@ const countKeysByPrefix = async (redis, prefix) => {
 // ─────────────────────────────────────────────
 const getKeysWithDetails = async (redis, prefix) => {
   const allKeys = [];
-  for await (const key of redis.scanIterator({ MATCH: `${prefix}*`, COUNT: 100 })) {
-    allKeys.push(key);
+  for await (const chunk of redis.scanIterator({ MATCH: `${prefix}*`, COUNT: 100 })) {
+    if (Array.isArray(chunk)) {
+      allKeys.push(...chunk);
+    } else {
+      allKeys.push(chunk);
+    }
   }
 
   // Lấy thông tin chi tiết của từng key song song
@@ -291,8 +295,12 @@ export const clearRecommendationCache = async (req, res) => {
     // Dùng scanIterator thay vì scan thủ công để tránh lỗi cursor type mismatch
     for (const prefix of Object.values(CACHE_PREFIXES)) {
       const keysToDelete = [];
-      for await (const key of redis.scanIterator({ MATCH: `${prefix}*`, COUNT: 100 })) {
-        keysToDelete.push(key);
+      for await (const chunk of redis.scanIterator({ MATCH: `${prefix}*`, COUNT: 100 })) {
+        if (Array.isArray(chunk)) {
+          keysToDelete.push(...chunk);
+        } else {
+          keysToDelete.push(chunk);
+        }
       }
       if (keysToDelete.length > 0) {
         // Xóa nhiều keys cùng lúc (del nhận spread args hoặc array)
