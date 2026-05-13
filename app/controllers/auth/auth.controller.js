@@ -110,6 +110,10 @@ export const googleLogin = async (req, res) => {
 
     // Verify CSRF token to prevent cross-site request forgery
     if (!g_csrf_token || g_csrf_token !== csrfCookie) {
+      if(!g_csrf_token) {
+        logger.warn('Google login: Missing CSRF token');
+        return res.redirect(`${FRONTEND_URL}/oauth/callback?oauth=error&message=missing_csrf_token`);
+      }
       logger.warn('Google login: CSRF token mismatch');
       return res.redirect(`${FRONTEND_URL}/oauth/callback?oauth=error&message=csrf_invalid`);
     }
