@@ -55,7 +55,7 @@ services:
     container_name: migrate
     env_file: .env
     command: npx prisma migrate deploy
-    depends_on:
+    # depends_on:
       # postgres:
       #   condition: service_healthy
     networks:

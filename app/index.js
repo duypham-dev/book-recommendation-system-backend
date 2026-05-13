@@ -16,7 +16,7 @@ const corsOptions = {
 
 // Initialize Express app
 const app = express();
-
+app.set('trust proxy', 1);
 // Apply security middleware
 app.use(helmet({
   referrerPolicy: { policy: 'no-referrer' },
