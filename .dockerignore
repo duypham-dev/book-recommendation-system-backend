@@ -1,0 +1,9 @@
+# .dockerignore
+node_modules
+.env*
+.git
+.gitignore
+*.md
+npm-debug.log
+docker-compose*.yml
+nginx/
