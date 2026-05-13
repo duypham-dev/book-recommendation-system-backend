@@ -16,8 +16,8 @@ async function startServer() {
     console.log('✓ RabbitMQ connected');
 
     // 3. Start Express server
-    app.listen(port, () => {
-      console.log(`✓ Server running at http://localhost:${port}`);
+    app.listen(port, '0.0.0.0', () => {
+      console.log(`✓ Server running at http://0.0.0.0:${port}`);
     });
   } catch (error) {
     console.error('✗ Failed to start server:', error.message);
