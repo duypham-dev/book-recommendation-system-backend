@@ -8,7 +8,7 @@ RUN npm ci --omit=dev
 # Generate Prisma client
 FROM deps AS builder
 COPY . .
-RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" DIRECT_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma generate
+RUN DATABASE_URL="postgresql://dummy:dummy@postgres:5432/dummy" DIRECT_URL="postgresql://dummy:dummy@postgres:5432/dummy" npx prisma generate
 
 # Final production image
 FROM base AS runner
