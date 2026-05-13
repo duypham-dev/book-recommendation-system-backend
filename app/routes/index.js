@@ -25,10 +25,6 @@ router.get('/health', (req, res) => {
   res.status(200).send({ status: 'OK' });
 });
 
-router.get('/test-deploy', (req, res) => {
-  res.status(200).send({ status: 'OK' });
-});
-
 // Mount user routes
 router.use(userBookRouter);
 router.use(userGenreRouter);
