@@ -5,21 +5,17 @@ import { publishFeedback } from '../../publishers/recommendation.publisher.js';
 // Import mappers
 import { toFavoriteActionResponse, toFavoritePaginatedResponse } from "#mappers/favorite.mapper.js";
 
-// ============================================
 // FAVORITES ENDPOINTS
-// ============================================
-
 /**
- * GET /users/:userId/favorites - Get user's favorites (paginated)
+ * GET /users/favorites - Get user's favorites (paginated)
  */
 export const getUserFavorites = async (req, res) => {
   try {
     const { userId }  = req.user;
-    logger.info(`Fetching favorites for user ${userId}`);
-    const { page = 0, size = 12 } = req.query;
+    const { page, size } = req.query;
     
     // 1. Call service to get raw entities with pagination
-    const result = await favoriteService.getUserFavorites(userId, parseInt(page), parseInt(size));
+    const result = await favoriteService.getUserFavorites(userId, page, size);
     
     // 2. Transform via mapper
     const response = toFavoritePaginatedResponse(result);
@@ -32,63 +28,46 @@ export const getUserFavorites = async (req, res) => {
 };
 
 /**
- * POST /users/:userId/favorites/:bookId - Add to favorites
+ * POST /users/favorites/:bookId - Add to favorites
  */
-export const addFavorite = async (req, res) => {
+export const addFavorite = async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { bookId } = req.params;
-    
-    // Verify user owns this action
-    if (req.user.userId !== userId) {
-      return ApiResponse.error(res, 'Unauthorized', 403);
-    }
-    
-    // 1. Call service
+
     const result = await favoriteService.addFavorite(userId, bookId);
-    
-    // 2. Transform via mapper
     const response = toFavoriteActionResponse(result.entity, result.alreadyExists);
-    
+
     if (result.alreadyExists) {
       return ApiResponse.success(res, response, 'Book already in favorites');
     }
-    
-    // Publish favorite event to RS (fire-and-forget, strength=5)
+
     publishFeedback(userId, { bookId, event: 'favorite', ratingValue: 5 });
-    
     return ApiResponse.created(res, response, 'Added to favorites');
   } catch (error) {
     logger.error('Add favorite error:', error);
-    return ApiResponse.error(res, 'Failed to add to favorites', 500);
+    next(error);
   }
 };
 
 /**
- * DELETE /users/:userId/favorites/:bookId - Remove from favorites
+ * DELETE /users/favorites/:bookId - Remove from favorites
  */
-export const removeFavorite = async (req, res) => {
+export const removeFavorite = async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { bookId } = req.params;
-    
-    // Verify user owns this action
-    if (req.user.userId !== userId) {
-      return ApiResponse.error(res, 'Unauthorized', 403);
-    }
-    
+
     const removed = await favoriteService.removeFavorite(userId, bookId);
-    
+
     if (!removed) {
       return ApiResponse.error(res, 'Favorite not found', 404);
     }
-    
-    // Publish unfavorite event to RS (fire-and-forget, strength=0 signals removal)
+
     publishFeedback(userId, { bookId, event: 'favorite', ratingValue: 0 });
-    
     return ApiResponse.success(res, null, 'Removed from favorites');
   } catch (error) {
     logger.error('Remove favorite error:', error);
-    return ApiResponse.error(res, 'Failed to remove from favorites', 500);
+    next(error);
   }
 };

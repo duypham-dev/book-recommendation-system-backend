@@ -29,24 +29,55 @@ const router = express.Router();
 
 router.get('/books/most-read', validate(mostReadQuerySchema, 'query'), getMostReadBooks);
 router.get('/books/search', validate(booksSearchQuerySchema, 'query'), getBookByKeyword);
+
 router.get('/books/genre/:genreId',
-    validateMultiple({ params: booksByGenreParamsSchema, query: booksByGenreQuerySchema }),
+    validateMultiple({ 
+        params: booksByGenreParamsSchema, 
+        query: booksByGenreQuerySchema 
+    }),
     getBooksByGenre
 );
-router.get('/books', validate(booksListQuerySchema, 'query'), getAllBooks);
+
+router.get('/books', 
+    validate(booksListQuerySchema, 'query'), 
+    getAllBooks
+);
 
 // Dynamic routes with :bookId — sub-resource routes must precede the bare /:bookId route
 router.get('/books/:bookId/same-genre',
-    validateMultiple({ params: bookIdParamsSchema, query: sameGenreQuerySchema }),
+    validateMultiple({ 
+        params: bookIdParamsSchema, 
+        query: sameGenreQuerySchema 
+    }),
     getSameGenreBooks
 );
-router.get('/books/:bookId/read-url', validate(bookIdParamsSchema, 'params'), getBookReadUrl);
-router.get('/books/:bookId/download/:formatId', validate(downloadBookParamsSchema, 'params'), downloadBook);
-router.get('/books/:bookId/preview', validate(bookIdParamsSchema, 'params'), getBookPreview);
+
+router.get('/books/:bookId/read-url', 
+    validate(bookIdParamsSchema, 'params'), 
+    getBookReadUrl
+);
+
+router.get('/books/:bookId/download/:formatId', 
+    validate(downloadBookParamsSchema, 'params'), 
+    downloadBook
+);
+
+router.get('/books/:bookId/preview', 
+    validate(bookIdParamsSchema, 'params'), 
+    getBookPreview
+);
+
 router.get('/books/:bookId/ratings',
-    validateMultiple({ params: bookIdParamsSchema, query: bookRatingsQuerySchema }),
+    validateMultiple({ 
+        params: bookIdParamsSchema, 
+        query: bookRatingsQuerySchema 
+    }),
     getBookRatingsPaginated
 );
-router.get('/books/:bookId', validate(bookIdParamsSchema, 'params'), getBookById);
+
+router.get('/books/:bookId', 
+    validate(bookIdParamsSchema, 'params'), 
+    getBookById
+);
 
 export { router as userBookRouter };

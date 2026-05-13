@@ -1,11 +1,6 @@
 /**
  * User Controller
  * Handles user profile, favorites, bookmarks, history, ratings
- * 
- * Best Practice Architecture:
- * - Controller handles HTTP request/response
- * - Service handles business logic, returns raw entities
- * - Mapper transforms entities to API response format
  */
 
 import { userService } from "#services/user.service.js";
@@ -21,12 +16,9 @@ import { toUserResponse, toUserProfileResponse, toUserAvatarResponse } from "#ma
 //Import storage service for avatar uploads
 import { uploadToCloudinary, deleteFromCloudinary, CLOUDINARY_FOLDERS } from "#services/storage.service.js";
 
-// ============================================
 // PROFILE ENDPOINTS
-// ============================================
-
 /**
- * GET /users/:userId - Get user profile
+ * GET /users/profile - Get user profile
  */
 export const getUserProfile = async (req, res) => {
   try {
@@ -50,7 +42,7 @@ export const getUserProfile = async (req, res) => {
 };
 
 /**
- * PUT /users/:userId/update - Update user profile
+ * PUT /users/profile - Update user profile
  */
 export const updateUserProfile = async (req, res) => {
   try {
@@ -58,11 +50,6 @@ export const updateUserProfile = async (req, res) => {
     const { username, fullName, phoneNumber, avatarUrl } = req.body;
 
     logger.info(`Updating profile for user ${userId} with data: ${JSON.stringify(req.body)}`);
-
-    // Verify user owns this profile or is admin
-    if (req.user.userId !== userId && req.user.role !== 'ADMIN') {
-      return ApiResponse.error(res, 'Unauthorized', 403);
-    }
 
     //Check new username doesn't conflict with another user (if username is being updated)
     const duplicateInfo = await checkExistingUser(null, username, phoneNumber, userId);
@@ -104,16 +91,11 @@ export const updateUserProfile = async (req, res) => {
 };
 
 /**
- * PATCH /users/:userId/avatar - Update user avatar
+ * PATCH /users/avatar - Update user avatar
  */
 export const updateUserAvatar = async (req, res) => {
   try {
     const { userId } = req.user;
-
-    // Verify user owns this profile
-    if (!userId || req.user.userId !== userId) {
-      return ApiResponse.error(res, 'Unauthorized', 403);
-    }
 
     // Handle file upload to Cloudinary
     let avatarUrl = '';
@@ -163,25 +145,12 @@ export const updateUserAvatar = async (req, res) => {
 };
 
 /**
- * PATCH /users/:userId/change-password - Change password
+ * PATCH /users/change-password - Change password
  */
 export const changeUserPassword = async (req, res) => {
   try {
     const { userId } = req.user;
     const { currentPassword, newPassword } = req.body;
-    
-    // Verify user owns this profile
-    if (req.user.userId !== userId) {
-      return ApiResponse.error(res, 'Unauthorized', 403);
-    }
-    
-    if (!currentPassword || !newPassword) {
-      return ApiResponse.error(res, 'Current and new password are required', 400);
-    }
-    
-    if (newPassword.length < 6) {
-      return ApiResponse.error(res, 'Password must be at least 6 characters', 400);
-    }
     
     // Verify current password
     const currentHash = await userService.getUserPasswordHash(userId);

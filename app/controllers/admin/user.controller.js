@@ -73,21 +73,15 @@ export const unbanUser = async (req, res) => {
 /**
  * PATCH /users/ban - Bulk ban users (Admin)
  */
-export const banUsersBulk = async (req, res) => {
+export const banUsersBulk = async (req, res, next) => {
   try {
-    const { ids } = req.body;
-    
-    if (!ids || !Array.isArray(ids) || ids.length === 0) {
-      return ApiResponse.error(res, 'User IDs are required', 400);
-    }
-    
+    const { ids } = req.body; // bulkIdsBodySchema validates ids is a non-empty array
+
     await userService.banUsersBulk(ids);
-    
     logger.info(`${ids.length} users banned by admin ${req.user.userId}`);
-    
     return ApiResponse.success(res, null, `${ids.length} users banned successfully`);
   } catch (error) {
     logger.error('Bulk ban users error:', error);
-    return ApiResponse.error(res, 'Failed to ban users', 500);
+    next(error);
   }
 };

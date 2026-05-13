@@ -5,13 +5,10 @@ import { publishFeedback } from '../../publishers/recommendation.publisher.js';
 // Import mappers
 import { toRatingListResponse, toRatingCreateResponse, toAverageRatingResponse } from "#mappers/rating.mapper.js";
 
-
-// ============================================
 // RATINGS ENDPOINTS
-// ============================================
 
 /**
- * GET /users/:userId/books/:bookId/ratings - Get ratings
+ * GET /books/:bookId/ratings - Get ratings
  */
 export const getBookRatings = async (req, res) => {
   try {
@@ -51,64 +48,49 @@ export const getMyRating = async (req, res) => {
 
 
 /**
- * POST /users/:userId/books/:bookId/ratings - Create or update rating
+ * POST /books/:bookId/ratings - Create or update rating
  */
-export const createOrUpdateRating = async (req, res) => {
+export const createOrUpdateRating = async (req, res, next) => {
   try {
     const { bookId } = req.params;
     const userId = req.user.userId;
-    const { value, comment } = req.body;
+    const { value, comment } = req.body; // ratingBodySchema validates value 1–5
 
-    if (!value || value < 1 || value > 5) {
-      return ApiResponse.error(res, 'Rating value must be between 1 and 5', 400);
-    }
-    
-    // 1. Call service
     const result = await ratingService.createOrUpdateRating(userId, bookId, value, comment);
-    
-    // 2. Publish feedback event to RS (fire-and-forget)
     publishFeedback(userId, { bookId, event: 'rating', ratingValue: value });
-    
-    // 3. Transform via mapper
     const response = toRatingCreateResponse(result.entity, result.isNew);
-    
+
     return ApiResponse.success(res, response, result.isNew ? 'Rating created' : 'Rating updated');
   } catch (error) {
     logger.error('Create/update rating error:', error);
-    return ApiResponse.error(res, 'Failed to save rating', 500);
+    next(error);
   }
 };
 
 /**
- * DELETE /users/:userId/books/:bookId/ratings - Delete rating
+ * DELETE /books/:bookId/ratings - Delete rating
  */
-export const deleteRating = async (req, res) => {
+export const deleteRating = async (req, res, next) => {
   try {
-    const { userId, bookId } = req.params;
-    
-    // Verify user owns this action
-    if (req.user.userId !== userId) {
-      return ApiResponse.error(res, 'Unauthorized', 403);
-    }
-    
+    const { bookId } = req.params;
+    const userId = req.user.userId; // from JWT — no userId in URL path
+
     const deleted = await ratingService.deleteRating(userId, bookId);
-    
+
     if (!deleted) {
       return ApiResponse.error(res, 'Rating not found', 404);
     }
-    
-    // Publish rating removal event to RS (strength 0 signals deletion)
+
     publishFeedback(userId, { bookId, event: 'rating', ratingValue: 0 });
-    
     return ApiResponse.success(res, null, 'Rating deleted');
   } catch (error) {
     logger.error('Delete rating error:', error);
-    return ApiResponse.error(res, 'Failed to delete rating', 500);
+    next(error);
   }
 };
 
 /**
- * GET /users/:userId/books/:bookId/average-rating - Get average rating
+ * GET /books/:bookId/average-rating - Get average rating
  */
 export const getAverageRating = async (req, res) => {
   try {

@@ -6,12 +6,10 @@ import { ApiResponse, logger } from "#utils/index.js";
 import { bookmarkService } from "#services/bookmark.service.js";
 import { toBookmarkListResponse, toBookmarkResponse } from "#mappers/bookmark.mapper.js";
 
-// ============================================
-// BOOKMARKS ENDPOINTS
-// ============================================
 
+// BOOKMARKS ENDPOINTS
 /**
- * GET /users/:userId/books/:bookId/bookmarks - Get bookmarks for a book
+ * GET /books/:bookId/bookmarks - Get bookmarks for a book
  */
 export const getBookmarks = async (req, res) => {
   try {
@@ -32,7 +30,7 @@ export const getBookmarks = async (req, res) => {
 };
 
 /**
- * POST /users/:userId/books/:bookId/bookmarks - Create bookmark
+ * POST /books/:bookId/bookmarks - Create bookmark
  */
 export const createBookmark = async (req, res) => {
   try {

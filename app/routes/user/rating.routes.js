@@ -1,29 +1,42 @@
 import express from 'express';
 import { authenticateToken } from '#middlewares/authenticateToken.js';
+import { validate, validateMultiple } from '#middlewares/validation.middleware.js';
+import {
+  bookIdParamsSchema,
+  ratingBodySchema,
+} from '#validators/interaction.validator.js';
+
 import {
   getBookRatings,
   createOrUpdateRating,
   deleteRating,
   getAverageRating,
-  getMyRating
+  getMyRating,
 } from '#controllers/user/rating.controller.js';
-
 
 const router = express.Router();
 
-// Get ratings for a book
-router.get('/books/:bookId/ratings', getBookRatings);
+// Public — no auth required
+router.get('/books/:bookId/ratings',      validate(bookIdParamsSchema, 'params'), getBookRatings);
+router.get('/books/:bookId/average-rating', validate(bookIdParamsSchema, 'params'), getAverageRating);
 
-// Get average rating for a book
-router.get('/books/:bookId/average-rating', getAverageRating);
+// Authenticated
+router.get('/books/:bookId/ratings/me',
+  authenticateToken,
+  validate(bookIdParamsSchema, 'params'),
+  getMyRating
+);
 
-// AUTHENTICATED ROUTES
-// Get user's own rating for a book
-router.get('/books/:bookId/ratings/me', authenticateToken, getMyRating);
+router.post('/books/:bookId/ratings',
+  authenticateToken,
+  validateMultiple({ params: bookIdParamsSchema, body: ratingBodySchema }),
+  createOrUpdateRating
+);
 
-//Create new or update user's rating for a book
-router.post('/books/:bookId/ratings', authenticateToken, createOrUpdateRating)
-      .delete('/books/:bookId/ratings', authenticateToken, deleteRating);
-
+router.delete('/books/:bookId/ratings',
+  authenticateToken,
+  validate(bookIdParamsSchema, 'params'),
+  deleteRating
+);
 
 export { router as ratingRouter };

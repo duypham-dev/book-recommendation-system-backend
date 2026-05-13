@@ -1,10 +1,15 @@
 import express from 'express';
 import { authenticateToken } from '#middlewares/authenticateToken.js';
 import { authorizeRole } from '#middlewares/authorize.middleware.js';
-import {ROLES} from '#constants/roles.js';
+import { ROLES } from '#constants/roles.js';
+import { validate, validateMultiple } from '#middlewares/validation.middleware.js';
+import {
+  adminListQuerySchema,
+  bookIdParamsSchema,
+  bulkIdsBodySchema,
+} from '#validators/admin.validator.js';
 import { uploadBookFiles } from '#middlewares/upload.middleware.js';
 
-// Book management Controllers
 import {
   getBooks,
   createBookHandler,
@@ -19,19 +24,61 @@ import {
 
 const router = express.Router();
 
-// ============================================
-// ADMIN BOOK MANAGEMENT
-// ============================================
-router.get('/admin/books/deleted', authenticateToken, authorizeRole(ROLES.ADMIN), getDeletedBooksHandler );
-router.patch('/admin/books/restore/:bookId', authenticateToken, authorizeRole(ROLES.ADMIN), restoreBookHandler);
-router.get('/admin/books', authenticateToken, authorizeRole(ROLES.ADMIN), getBooks);
-router.post('/admin/books/create', authenticateToken,  authorizeRole(ROLES.ADMIN), uploadBookFiles, createBookHandler);
-router.put('/admin/books/update/:bookId', authenticateToken, authorizeRole(ROLES.ADMIN), uploadBookFiles,  updateBookHandler);
-router.delete('/admin/books/hard-delete/:bookId', authenticateToken, authorizeRole(ROLES.ADMIN), hardDeleteBookHandler);
-router.delete('/admin/books/delete/:bookId', authenticateToken, authorizeRole(ROLES.ADMIN), deleteBookHandler);
-router.delete('/admin/books', authenticateToken, authorizeRole(ROLES.ADMIN), deleteBooksBulkHandler);
+const adminGuard = [authenticateToken, authorizeRole(ROLES.ADMIN)];
 
-// Book formats (public - for reader)
-router.get('/books/:bookId/formats', getBookFormatsHandler);
+router.get('/admin/books/deleted',
+  ...adminGuard,
+  validate(adminListQuerySchema, 'query'),
+  getDeletedBooksHandler
+);
+
+router.get('/admin/books',
+  ...adminGuard,
+  validate(adminListQuerySchema, 'query'),
+  getBooks
+);
+
+router.post('/admin/books/create',
+  ...adminGuard,
+  uploadBookFiles,          // multer must run before body validation
+  createBookHandler
+);
+
+router.put('/admin/books/update/:bookId',
+  ...adminGuard,
+  validate(bookIdParamsSchema, 'params'),
+  uploadBookFiles,
+  updateBookHandler
+);
+
+router.patch('/admin/books/restore/:bookId',
+  ...adminGuard,
+  validate(bookIdParamsSchema, 'params'),
+  restoreBookHandler
+);
+
+router.delete('/admin/books/hard-delete/:bookId',
+  ...adminGuard,
+  validate(bookIdParamsSchema, 'params'),
+  hardDeleteBookHandler
+);
+
+router.delete('/admin/books/delete/:bookId',
+  ...adminGuard,
+  validate(bookIdParamsSchema, 'params'),
+  deleteBookHandler
+);
+
+router.delete('/admin/books',
+  ...adminGuard,
+  validate(bulkIdsBodySchema, 'body'),
+  deleteBooksBulkHandler
+);
+
+// Public route — for the reader
+router.get('/books/:bookId/formats',
+  validate(bookIdParamsSchema, 'params'),
+  getBookFormatsHandler
+);
 
 export { router as adminBookRouter };

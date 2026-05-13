@@ -1,10 +1,5 @@
 /**
  * User Recommendation Controller
- *
- * Pattern: throw a typed AppError subclass inside the try block,
- * then pass ALL errors (both expected and unexpected) to next(error).
- * The global errorHandler in app/middlewares/errorHandler.js takes care
- * of formatting and sending the response — controllers stay thin.
  */
 
 import * as recommendationService from '#services/recommendation.service.js';
@@ -22,11 +17,6 @@ export const getBookRecommendations = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
 
     const recommendations = await recommendationService.getRecommendations(userId, limit);
-    
-    // If the service returns nothing we treat it as a normal (empty) success,
-    // but if a user record is missing the service should throw — which we
-    // would catch here and re-throw as NotFoundError:
-    //   throw new NotFoundError('User profile not found');
 
     ApiResponse.success(
       res,
@@ -34,7 +24,6 @@ export const getBookRecommendations = async (req, res, next) => {
       'Recommendations fetched successfully'
     );
   } catch (error) {
-    // Propagate to the global error handler — no manual res.status() calls needed.
     next(error);
   }
 };
@@ -42,11 +31,6 @@ export const getBookRecommendations = async (req, res, next) => {
 /**
  * GET /books/:bookId/similar
  * Returns books that are content-similar to the given book.
- *
- * Example of how to use typed errors:
- *   - Missing required param   → BadRequestError
- *   - Book not in database     → NotFoundError (thrown by service or manually)
- *   - User lacks permission    → ForbiddenError
  */
 export const getSimilarBooks = async (req, res, next) => {
   try {

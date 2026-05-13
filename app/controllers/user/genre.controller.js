@@ -26,9 +26,6 @@ const getAllGenres = async (req, res) => {
  */
 const getGenreById = async (req, res) => {
     const { genreId } = req.params;
-    if (!genreId) {
-        return ApiResponse.error(res, 'Genre ID is required', 400);
-    }
 
     try {
         const genre = await genreService.getGenreById(genreId);

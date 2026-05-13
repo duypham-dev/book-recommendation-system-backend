@@ -9,7 +9,6 @@ import { toHistoryPaginatedResponse, toHistoryActionResponse } from "#mappers/hi
 // ============================================
 // HISTORY ENDPOINTS
 // ============================================
-
 /**
  * GET /users/history - Get reading history
  */

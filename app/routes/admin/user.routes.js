@@ -1,18 +1,42 @@
 import express from 'express';
 import { authenticateToken } from '#middlewares/authenticateToken.js';
 import { authorizeRole } from '#middlewares/authorize.middleware.js';
-import {ROLES} from '#constants/roles.js';
-import {getAllUsers, banUser, unbanUser, banUsersBulk } from '#controllers/admin/user.controller.js';
+import { ROLES } from '#constants/roles.js';
+import { validate } from '#middlewares/validation.middleware.js';
+import {
+  adminListQuerySchema,
+  userIdParamsSchema,
+  bulkIdsBodySchema,
+} from '#validators/admin.validator.js';
+
+import { getAllUsers, banUser, unbanUser, banUsersBulk } from '#controllers/admin/user.controller.js';
 
 const router = express.Router();
 
-// ============================================
-// ADMIN USER MANAGEMENT
-// ============================================
-router.get('/admin/users', authenticateToken, authorizeRole(ROLES.ADMIN), getAllUsers);
+const adminGuard = [authenticateToken, authorizeRole(ROLES.ADMIN)];
 
-router.patch('/users/:userId/ban', authenticateToken, authorizeRole(ROLES.ADMIN), banUser);
-router.patch('/users/:userId/unban', authenticateToken, authorizeRole(ROLES.ADMIN), unbanUser);
-router.patch('/users/ban', authenticateToken, authorizeRole(ROLES.ADMIN), banUsersBulk);
+router.get('/admin/users',
+  ...adminGuard,
+  validate(adminListQuerySchema, 'query'),
+  getAllUsers
+);
+
+router.patch('/users/:userId/ban',
+  ...adminGuard,
+  validate(userIdParamsSchema, 'params'),
+  banUser
+);
+
+router.patch('/users/:userId/unban',
+  ...adminGuard,
+  validate(userIdParamsSchema, 'params'),
+  unbanUser
+);
+
+router.patch('/users/ban',
+  ...adminGuard,
+  validate(bulkIdsBodySchema, 'body'),
+  banUsersBulk
+);
 
 export { router as userManagementRouter };

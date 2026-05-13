@@ -43,13 +43,10 @@ export const getBooks = async (req, res) => {
  *   authorNames (repeated), genreIds (repeated)
  * Expected files: cover (image), pdfFile, epubFile
  */
-export const createBookHandler = async (req, res) => {
+export const createBookHandler = async (req, res, next) => {
   try {
     const { title, description, publicationYear, publisher } = req.body;
-
-    if (!title || !description) {
-      return ApiResponse.error(res, 'All text fields are required', 400);
-    }
+    // title + description required — validated upstream by route-level middleware if added
 
     // Parse repeated form fields — multer may deliver a string or an array
     const authorNames = Array.isArray(req.body.authorNames)
@@ -108,7 +105,7 @@ export const createBookHandler = async (req, res) => {
     return ApiResponse.created(res, book, 'Book created successfully');
   } catch (error) {
     logger.error('Create book error:', error);
-    return ApiResponse.error(res, 'Failed to create book', 500);
+    next(error);
   }
 };
 
@@ -185,11 +182,10 @@ export const updateBookHandler = async (req, res) => {
     });
 
     logger.info(`Book updated: ${bookId} by admin ${req.user.userId}`);
-
     return ApiResponse.success(res, book, 'Book updated successfully');
   } catch (error) {
     logger.error('Update book error:', error);
-    return ApiResponse.error(res, 'Failed to update book', 500);
+    next(error);
   }
 };
 
@@ -214,22 +210,16 @@ export const deleteBookHandler = async (req, res) => {
 /**
  * DELETE /admin/books - Bulk delete books
  */
-export const deleteBooksBulkHandler = async (req, res) => {
+export const deleteBooksBulkHandler = async (req, res, next) => {
   try {
-    const { ids } = req.body;
-    
-    if (!ids || !Array.isArray(ids) || ids.length === 0) {
-      return ApiResponse.error(res, 'Book IDs are required', 400);
-    }
-    
+    const { ids } = req.body; // bulkIdsBodySchema validates ids is a non-empty array
+
     await deleteBooksBulk(ids);
-    
     logger.info(`${ids.length} books deleted by admin ${req.user.userId}`);
-    
     return ApiResponse.success(res, null, `${ids.length} books deleted successfully`);
   } catch (error) {
     logger.error('Bulk delete books error:', error);
-    return ApiResponse.error(res, 'Failed to delete books', 500);
+    next(error);
   }
 };
 
