@@ -106,7 +106,7 @@ services:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     ports:
-      - "10.104.0.3:5672:5672"    # ← KHÔNG expose ra 0.0.0.0
+      - "127.0.0.1:5672:5672"    # ← KHÔNG expose ra 0.0.0.0
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
