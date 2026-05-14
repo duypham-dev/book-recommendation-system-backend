@@ -95,7 +95,7 @@ export function refreshCookieOptions() {
   return {
     httpOnly: true,                    // Not accessible via JavaScript
     secure: isProd,                    // HTTPS only in production
-    sameSite: isProd ? "none" : "lax", // CSRF protection
+    sameSite: "lax", // CSRF protection
     path: "/",              // Only sent to auth endpoints
     maxAge: TOKEN_EXPIRY.REFRESH_SECONDS * 1000, // Match token expiry (in ms)
     domain: isProd ? process.env.COOKIE_DOMAIN : undefined,
@@ -110,7 +110,7 @@ export function clearRefreshCookieOptions() {
   return {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? "none" : "lax",
+    sameSite: "lax",
     path: "/",
     domain: isProd ? process.env.COOKIE_DOMAIN : undefined,
   };
