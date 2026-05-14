@@ -8,7 +8,7 @@ import { logger } from '#utils/index.js';
 
 const transporter = new Resend(process.env.RESEND_API_KEY);
 
-const DEFAULT_FROM = process.env.SMTP_FROM || 'TekBook <noreply@tekbook.me>';
+const DEFAULT_FROM = process.env.SMTP_FROM || 'TekBook <noreply@api.tekbook.website>';
 
 // const transporter = nodemailer.createTransport({
 //   host: process.env.SMTP_HOST,

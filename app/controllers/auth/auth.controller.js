@@ -107,8 +107,7 @@ export const googleLogin = async (req, res) => {
       logger.warn('Google login: Missing ID token');
       return res.redirect(`${FRONTEND_URL}/oauth/callback?oauth=error&message=missing_token`);
     }
-    logger.warn('Google login: CSRF token', g_csrf_token);
-    logger.warn('Google login: CSRF cookie', csrfCookie);
+    
     // Verify CSRF token to prevent cross-site request forgery
     if (!g_csrf_token || g_csrf_token !== csrfCookie) {
       if(!g_csrf_token) {
