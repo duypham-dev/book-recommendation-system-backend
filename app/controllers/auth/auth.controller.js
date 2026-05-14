@@ -100,11 +100,10 @@ async function createSessionAndSetCookie(res, userId, metadata) {
 export const googleLogin = async (req, res) => {
   try {
     const { credential: idToken, g_csrf_token } = req.body;
-    const csrfCookie = req.cookies?.g_csrf_token;
 
     // Validate required fields
-    if (!idToken) {
-      logger.warn('Google login: Missing ID token');
+    if (!idToken || !g_csrf_token) {
+      logger.warn('Google login: Missing ID token or CSRF token');
       return res.redirect(`${FRONTEND_URL}/oauth/callback?oauth=error&message=missing_token`);
     }
 
