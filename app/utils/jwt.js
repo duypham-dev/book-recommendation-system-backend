@@ -91,14 +91,12 @@ export function verifyAccessToken(token) {
  * HttpOnly prevents XSS, Secure ensures HTTPS in production
  */
 export function refreshCookieOptions() {
-  const isProd = process.env.NODE_ENV === "production";
   return {
     httpOnly: true,                    // Not accessible via JavaScript
-    secure: isProd,                    // HTTPS only in production
-    sameSite: "lax", // CSRF protection
-    path: "/",              // Only sent to auth endpoints
+    secure: true,                      // HTTPS only (Required for SameSite=None)
+    sameSite: "none",                  // Allow cross-origin cookie setting
+    path: "/",                         // Only sent to auth endpoints
     maxAge: TOKEN_EXPIRY.REFRESH_SECONDS * 1000, // Match token expiry (in ms)
-    domain: isProd ? process.env.COOKIE_DOMAIN : undefined,
   };
 }
 
@@ -106,12 +104,10 @@ export function refreshCookieOptions() {
  * Options to clear refresh token cookie on logout
  */
 export function clearRefreshCookieOptions() {
-  const isProd = process.env.NODE_ENV === "production";
   return {
     httpOnly: true,
-    secure: isProd,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
     path: "/",
-    domain: isProd ? process.env.COOKIE_DOMAIN : undefined,
   };
 }
