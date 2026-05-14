@@ -9,8 +9,14 @@ import { notFoundHandler, errorHandler } from '#middlewares/errorHandler.js';
 
 
 const baseUrl = process.env.BASE_URL || '/api/v1';
+
+//CORS Configuration
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: [
+    'https://tekbook.website',
+    'https://www.tekbook.website',
+    process.env.FRONTEND_URL
+  ].filter(Boolean),
   credentials: true
 };
 
