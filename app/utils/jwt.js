@@ -8,7 +8,7 @@ import "dotenv/config";
 
 // Token expiration times
 export const TOKEN_EXPIRY = {
-  ACCESS: "15m",                // 15 minutes
+  ACCESS: "1m",                // 15 minutes
   REFRESH: "7d",               // 7 days
   ACCESS_SECONDS: 15 * 60,
   REFRESH_SECONDS: 7 * 24 * 60 * 60,
