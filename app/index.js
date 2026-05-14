@@ -17,7 +17,9 @@ const corsOptions = {
     'https://www.tekbook.website',
     process.env.FRONTEND_URL
   ].filter(Boolean),
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 // Initialize Express app
@@ -29,9 +31,9 @@ app.use(helmet({
 }));
 
 app.use(morgan('common'));
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
-app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: false })); // GIS redirect POST form
 app.set("json replacer", (key, value) =>
   typeof value === "bigint" ? value.toString() : value
