@@ -41,7 +41,7 @@ export const loginRateLimit = rateLimit({
  */
 export const registerRateLimit = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3, // Maximum 3 registrations per hour per IP
+  max: 10, // Maximum 10 registrations per hour per IP
   message: {
     success: false,
     message: 'Too many registration attempts. Please try again after 1 hour.',
