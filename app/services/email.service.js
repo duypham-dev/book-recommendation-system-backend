@@ -1,21 +1,26 @@
 import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { logger } from '#utils/index.js';
 
 // =============================================================================
 // TRANSPORTER CONFIGURATION
 // =============================================================================
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: Number(process.env.SMTP_PORT) === 465,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const transporter = new Resend(process.env.RESEND_API_KEY);
 
-const DEFAULT_FROM = process.env.SMTP_FROM || `"TekBook" <${process.env.SMTP_USER}>`;
+const DEFAULT_FROM = process.env.SMTP_FROM || 'TekBook <noreply@tekbook.me>';
+
+// const transporter = nodemailer.createTransport({
+//   host: process.env.SMTP_HOST,
+//   port: Number(process.env.SMTP_PORT) || 587,
+//   secure: Number(process.env.SMTP_PORT) === 465,
+//   auth: {
+//     user: process.env.SMTP_USER,
+//     pass: process.env.SMTP_PASS,
+//   },
+// });
+
+// const DEFAULT_FROM = process.env.SMTP_FROM || `"TekBook" <${process.env.SMTP_USER}>`;
 
 // =============================================================================
 // EMAIL TEMPLATES
@@ -136,16 +141,20 @@ function accountActivationHtml(activationUrl) {
  * @param {string} resetUrl - Full URL the user should visit to reset their password
  */
 export async function sendPasswordResetEmail(toEmail, resetUrl) {
-  const mailOptions = {
-    from: DEFAULT_FROM,
-    to: toEmail,
-    subject: 'Đặt lại mật khẩu — TekBook',
-    html: passwordResetHtml(resetUrl),
-  };
-
   try {
-    const info = await transporter.sendMail(mailOptions);
-    logger.info('Password reset email sent', { to: toEmail, messageId: info.messageId });
+    const { data, error } = await transporter.emails.send({
+      from: DEFAULT_FROM,
+      to: toEmail,
+      subject: 'Đặt lại mật khẩu — TekBook',
+      html: passwordResetHtml(resetUrl),
+    });
+
+    if (error) {
+      logger.error('Failed to send password reset email', { to: toEmail, error });
+      throw new Error('Không thể gửi email đặt lại mật khẩu');
+    }
+
+    logger.info('Password reset email sent', { to: toEmail, messageId: data.id });
   } catch (error) {
     logger.error('Failed to send password reset email', { to: toEmail, error: error.message });
     throw new Error('Không thể gửi email đặt lại mật khẩu');
@@ -159,15 +168,20 @@ export async function sendPasswordResetEmail(toEmail, resetUrl) {
  * @param {string} activationUrl - Full URL the user should visit to activate their account
  */
 export async function sendAccountActivationEmail(toEmail, activationUrl) {
-  const mailOptions = {
-    from: DEFAULT_FROM,
-    to: toEmail,
-    subject: 'Kích hoạt tài khoản — TekBook',
-    html: accountActivationHtml(activationUrl),
-  };
-  try{
-    const info = await transporter.sendMail(mailOptions);
-    logger.info('Account activation email sent', { to: toEmail, messageId: info.messageId });
+  try {
+    const { data, error } = await transporter.emails.send({
+      from: DEFAULT_FROM,
+      to: toEmail,
+      subject: 'Kích hoạt tài khoản — TekBook',
+      html: accountActivationHtml(activationUrl),
+    });
+
+    if (error) {
+      logger.error('Failed to send account activation email', { to: toEmail, error });
+      throw new Error('Không thể gửi email kích hoạt tài khoản');
+    }
+
+    logger.info('Account activation email sent', { to: toEmail, messageId: data.id });
   } catch (error) {
     logger.error('Failed to send account activation email', { to: toEmail, error: error.message });
     throw new Error('Không thể gửi email kích hoạt tài khoản');
