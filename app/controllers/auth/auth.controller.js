@@ -188,12 +188,6 @@ export const googleLogin = async (req, res) => {
 /**
  * POST /auth/login - Email/Password login
  * 
- * Flow:
- * 1. Validate email and password
- * 2. Find user by email
- * 3. Verify password hash
- * 4. Create session and return tokens
- * 
  * @param {Request} req - Express request with email and password
  * @param {Response} res - Express response with user data and tokens
  */
