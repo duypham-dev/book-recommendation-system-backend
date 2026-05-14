@@ -98,7 +98,7 @@ export function refreshCookieOptions() {
     sameSite: isProd ? "none" : "lax", // CSRF protection
     path: "/api/v1/auth",              // Only sent to auth endpoints
     maxAge: TOKEN_EXPIRY.REFRESH_SECONDS * 1000, // Match token expiry (in ms)
-    domain: ".tekbook.website",
+    domain: ".www.tekbook.website",
   };
 }
 
@@ -112,6 +112,6 @@ export function clearRefreshCookieOptions() {
     secure: isProd,
     sameSite: isProd ? "none" : "lax",
     path: "/api/v1/auth",
-    domain: ".tekbook.website",
+    domain: ".www.tekbook.website",
   };
 }
