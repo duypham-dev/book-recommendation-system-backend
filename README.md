@@ -42,24 +42,25 @@ The backend service for the TekBook book recommendation platform. Built on **Exp
 
 ## Architecture Overview
 
-```
-Client (Next.js)
+```text
+Web Client (React / Vite SPA)
       |
       v
   Nginx (TLS termination, reverse proxy)
       |
       v
-  Express API Server (:8080)
+  Express API Server (Node.js)
       |----> PostgreSQL (via Prisma ORM)
       |----> Redis (session store, response cache)
-      |----> RabbitMQ (async job dispatch)
-      |----> Recommendation Service (FastAPI, HTTP)
-      |----> Cloudinary (image CDN)
-      |----> MinIO / S3 (book file storage)
+      |----> RabbitMQ (async event & job dispatch)
+      |----> Cloudinary (image CDN / Upload Images)
+      |----> Supabase Storage (S3-compatible, eBook file storage)
+      |----> AI Recommendation Core (FastAPI / HTTP for predictions)
       |
-  Workers (separate Node.js processes)
-      |----> Email Worker (consumes email_queue)
-      |----> Cache Invalidation Worker (consumes cache_invalidation_queue)
+  Background Workers & Consumers
+      |----> Email Worker (consumes Email Tasks -> SMTP)
+      |----> Cache Worker (consumes Cache Tasks -> Redis)
+      |----> Recommender Consumer (Python, consumes Interactions/Retrain triggers)
 ```
 
 The API server acts as the sole entry point for all client requests. It delegates long-running or non-critical tasks to RabbitMQ-backed workers, ensuring low-latency responses. The recommendation engine is a separate FastAPI service; this backend proxies admin management endpoints and caches recommendation results in Redis.
@@ -69,7 +70,7 @@ The API server acts as the sole entry point for all client requests. It delegate
 ## System Design Diagram
 
 <!-- Replace the path below with the actual system design image -->
-![System Design](docs/SD.png)
+![System Design](docs/SD2.png)
 
 ---
 
