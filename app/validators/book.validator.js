@@ -106,3 +106,7 @@ export const mostReadQuerySchema = Joi.object({
 })
   .rename('page', 'offset', { override: true, ignoreUndefined: true })
   .rename('size', 'limit', { override: true, ignoreUndefined: true });
+
+export const recentlyUploadedQuerySchema = Joi.object({
+  limit: limitQuery(10, 50)
+});

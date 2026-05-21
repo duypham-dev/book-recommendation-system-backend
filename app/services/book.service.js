@@ -304,6 +304,46 @@ const getMostReadBooks = async (offset = 0, limit = 10) => {
   return booksWithCount;
 }
 
+// Function to get recently uploaded books
+const getRecentlyUploadedBooks = async (limit = 10) => {
+  const books = await prisma.books.findMany({
+    where: {
+      is_deleted: false,
+    },
+    orderBy: {
+      created_at: 'desc',
+    },
+    take: parseInt(limit),
+    select: {
+      book_id: true,
+      title: true,
+      cover_image_url: true,
+      description: true,
+      book_authors: {
+        select: {
+          authors: {
+            select: {
+              author_id: true,
+              author_name: true,
+            },
+          },
+        },
+      },
+      book_genres: {
+        select: {
+          genres: {
+            select: {
+              genre_id: true,
+              genre_name: true,
+            },
+          },
+        },
+      },
+    },
+  });
+  return books;
+}
+
 const getBookByKeyword = async (keyword, offset = 0, limit = 10) => {
   const books = await prisma.books.findMany({
     select: {
@@ -920,6 +960,7 @@ export {
   getBookReadUrl,
   getBookDownloadUrl,
   getBookCoverUrl,
+  getRecentlyUploadedBooks,
 };
 
 export const bookService = {
@@ -940,4 +981,5 @@ export const bookService = {
   getBookReadUrl,
   getBookDownloadUrl,
   getBookCoverUrl,
+  getRecentlyUploadedBooks,
 };

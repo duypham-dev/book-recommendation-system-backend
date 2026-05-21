@@ -11,6 +11,7 @@ import {
     getBookByKeyword as getBookByKeywordService,
     getBookReadUrl as getBookReadUrlService,
     getBookDownloadUrl as getBookDownloadUrlService,
+    getRecentlyUploadedBooks as getRecentlyUploadedBooksService,
 } from "#services/book.service.js";
 import { getBookRatingsPaginated as getBookRatingsPaginatedService } from "#services/rating.service.js";
 
@@ -99,6 +100,18 @@ const getMostReadBooks = async (req, res, next) => {
     }
 }
 
+const getRecentlyUploadedBooks = async (req, res, next) => {
+    const { limit = 10 } = req.query;
+
+    try {
+        const books = await getRecentlyUploadedBooksService(limit);
+        logger.info(`Fetched ${books.length} recently uploaded books`);
+        return ApiResponse.success(res, toBookListResponse(books), 'Recently uploaded books fetched successfully');
+    } catch (err) {
+        logger.error(`Error fetching recently uploaded books: ${err.message}`);
+        next(err);
+    }
+}
 
 const getBookPreview = async (req, res, next) => {
     const { bookId } = req.params;
@@ -203,4 +216,4 @@ const getSameGenreBooks = async (req, res, next) => {
     }
 }
 
-export { getBooksByGenre, getSameGenreBooks, getBookById, getMostReadBooks, getAllBooks, getBookPreview, getBookByKeyword, getBookReadUrl, downloadBook, getBookRatingsPaginated };
+export { getBooksByGenre, getSameGenreBooks, getBookById, getMostReadBooks, getAllBooks, getBookPreview, getBookByKeyword, getBookReadUrl, downloadBook, getBookRatingsPaginated, getRecentlyUploadedBooks };

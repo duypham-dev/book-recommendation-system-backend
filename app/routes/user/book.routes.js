@@ -9,7 +9,8 @@ import {
     bookRatingsQuerySchema,
     sameGenreQuerySchema,
     downloadBookParamsSchema,
-    mostReadQuerySchema
+    mostReadQuerySchema,
+    recentlyUploadedQuerySchema
 } from '#validators/book.validator.js';
 
 import {
@@ -23,10 +24,12 @@ import {
     getBookReadUrl,
     downloadBook,
     getBookRatingsPaginated,
+    getRecentlyUploadedBooks,
 } from '#controllers/user/book.controller.js';
 
 const router = express.Router();
 
+router.get('/books/recently-uploaded', validate(recentlyUploadedQuerySchema, 'query'), getRecentlyUploadedBooks);
 router.get('/books/most-read', validate(mostReadQuerySchema, 'query'), getMostReadBooks);
 router.get('/books/search', validate(booksSearchQuerySchema, 'query'), getBookByKeyword);
 
