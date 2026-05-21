@@ -19,6 +19,27 @@ jobs:
   ci:
     name: Lint & Test
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+      JWT_ACCESS_SECRECT: ci-access-secret-at-least-32-characters-long
+      JWT_REFRESH_SECRECT: ci-refresh-secret-at-least-32-characters-long
+      FRONTEND_URL: http://localhost:5173
+      DATABASE_URL: postgresql://test:test@localhost:5432/testdb
+      REDIS_HOST: localhost
+      REDIS_PORT: '6379'
+      REDIS_PASSWORD: test-redis-pass
+      RABBITMQ_URL: amqp://guest:guest@localhost:5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
+      CLOUDINARY_CLOUD_NAME: test-cloud
+      CLOUDINARY_API_KEY: test-key
+      CLOUDINARY_API_SECRET: test-secret
+      MINIO_ENDPOINT: http://localhost:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: test-bucket
+      RECOMMENDATION_SERVICE_URL: http://localhost:8003
+      RESEND_API_KEY: test-resend-key
 
     steps:
       - name: Checkout code
@@ -41,27 +62,6 @@ jobs:
 
       - name: Run tests
         run: npx vitest run
-        env:
-          NODE_ENV: test
-          JWT_ACCESS_SECRECT: ci-access-secret-at-least-32-characters-long
-          JWT_REFRESH_SECRECT: ci-refresh-secret-at-least-32-characters-long
-          FRONTEND_URL: http://localhost:5173
-          DATABASE_URL: postgresql://test:test@localhost:5432/testdb
-          REDIS_HOST: localhost
-          REDIS_PORT: '6379'
-          REDIS_PASSWORD: test-redis-pass
-          RABBITMQ_URL: amqp://guest:guest@localhost:5672
-          RABBITMQ_USER: guest
-          RABBITMQ_PASSWORD: guest
-          CLOUDINARY_CLOUD_NAME: test-cloud
-          CLOUDINARY_API_KEY: test-key
-          CLOUDINARY_API_SECRET: test-secret
-          MINIO_ENDPOINT: http://localhost:9000
-          MINIO_ACCESS_KEY: minioadmin
-          MINIO_SECRET_KEY: minioadmin
-          MINIO_BUCKET: test-bucket
-          RECOMMENDATION_SERVICE_URL: http://localhost:8003
-          RESEND_API_KEY: test-resend-key
 
   # ─────────────────────────────────────────────────────────────────────────────
   # Job 2: Deploy
