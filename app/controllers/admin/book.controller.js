@@ -116,7 +116,7 @@ export const createBookHandler = async (req, res, next) => {
  *   authorNames (repeated), genreIds (repeated)
  * Expected files: cover (image), pdfFile, epubFile
  */
-export const updateBookHandler = async (req, res) => {
+export const updateBookHandler = async (req, res, next) => {
   try {
     const { bookId } = req.params;
     const { title, description, publicationYear, publisher } = req.body;

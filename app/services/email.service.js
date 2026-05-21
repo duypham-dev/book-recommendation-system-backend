@@ -1,4 +1,3 @@
-import nodemailer from 'nodemailer';
 import { Resend } from 'resend';
 import { logger } from '#utils/index.js';
 

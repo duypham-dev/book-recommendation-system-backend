@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticateToken } from '#middlewares/authenticateToken.js';
-import { validate, validateMultiple } from '#middlewares/validation.middleware.js';
+import { validate } from '#middlewares/validation.middleware.js';
 import {
   updateProfileBodySchema,
   changePasswordBodySchema,

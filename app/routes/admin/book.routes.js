@@ -2,7 +2,7 @@ import express from 'express';
 import { authenticateToken } from '#middlewares/authenticateToken.js';
 import { authorizeRole } from '#middlewares/authorize.middleware.js';
 import { ROLES } from '#constants/roles.js';
-import { validate, validateMultiple } from '#middlewares/validation.middleware.js';
+import { validate } from '#middlewares/validation.middleware.js';
 import {
   adminListQuerySchema,
   bookIdParamsSchema,

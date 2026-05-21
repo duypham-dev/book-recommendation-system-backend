@@ -12,6 +12,6 @@ export default defineConfig([
   { files: ["**/*.js"], languageOptions: { sourceType: "module" } },
   {
     // Thêm dòng này để bỏ qua các thư mục không muốn quét
-    ignores: ["node_modules/", "dist/", "public/"]
+    ignores: ["node_modules/", "dist/", "public/", "app/generated/"]
   },
 ]);
