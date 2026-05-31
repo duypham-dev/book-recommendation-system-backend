@@ -42,25 +42,24 @@ The backend service for the TekBook book recommendation platform. Built on **Exp
 
 ## Architecture Overview
 
-```text
-Web Client (React / Vite SPA)
-      |
-      v
-  Nginx (TLS termination, reverse proxy)
-      |
-      v
-  Express API Server (Node.js)
-      |----> PostgreSQL (via Prisma ORM)
-      |----> Redis (session store, response cache)
-      |----> RabbitMQ (async event & job dispatch)
-      |----> Cloudinary (image CDN / Upload Images)
-      |----> Supabase Storage (S3-compatible, eBook file storage)
-      |----> AI Recommendation Core (FastAPI / HTTP for predictions)
-      |
-  Background Workers & Consumers
-      |----> Email Worker (consumes Email Tasks -> SMTP)
-      |----> Cache Worker (consumes Cache Tasks -> Redis)
-      |----> Recommender Consumer (Python, consumes Interactions/Retrain triggers)
+```mermaid
+flowchart TD
+    Client["Web Client<br>(React / Vite SPA)"] --> Nginx["Nginx<br>(TLS termination, reverse proxy)"]
+    Nginx --> Express["Express API Server<br>(Node.js)"]
+    
+    %% Các liên kết từ Express Server
+    Express --> Postgres[("PostgreSQL<br>(via Prisma ORM)")]
+    Express --> Redis[("Redis<br>(session store, response cache)")]
+    Express --> RabbitMQ[["RabbitMQ<br>(async event & job dispatch)"]]
+    Express --> Cloudinary["Cloudinary<br>(image CDN / Upload Images)"]
+    Express --> Supabase["Supabase Storage<br>(S3-compatible, eBook file storage)"]
+    Express --> AI["AI Recommendation Core<br>(FastAPI / HTTP for predictions)"]
+    
+    %% Luồng xuống Background Workers
+    Express --> Workers["Background Workers & Consumers"]
+    Workers --> Email["Email Worker<br>(consumes Email Tasks -> SMTP)"]
+    Workers --> Cache["Cache Worker<br>(consumes Cache Tasks -> Redis)"]
+    Workers --> Recommender["Recommender Consumer<br>(Python, consumes Interactions/Retrain triggers)"]
 ```
 
 The API server acts as the sole entry point for all client requests. It delegates long-running or non-critical tasks to RabbitMQ-backed workers, ensuring low-latency responses. The recommendation engine is a separate FastAPI service; this backend proxies admin management endpoints and caches recommendation results in Redis.
