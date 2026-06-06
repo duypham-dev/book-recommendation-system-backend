@@ -352,11 +352,11 @@ All admin endpoints require `Bearer` token with `ADMIN` role.
 | ------ | ------------------------------------- | ---------------------------------- |
 | GET    | `/admin/books`                        | List all books (admin view)        |
 | GET    | `/admin/books/deleted`                | List soft-deleted books            |
-| POST   | `/admin/books/create`                 | Create a book (multipart upload)   |
-| PUT    | `/admin/books/update/:bookId`         | Update book details and files      |
-| DELETE | `/admin/books/delete/:bookId`         | Soft-delete a book                 |
+| POST   | `/admin/books`                 | Create a book (multipart upload)   |
+| PUT    | `/admin/books/:bookId`         | Update book details and files      |
+| DELETE | `/admin/books/:bookId`         | Soft-delete a book                 |
 | DELETE | `/admin/books`                        | Bulk soft-delete books             |
-| PATCH  | `/admin/books/restore/:bookId`        | Restore a soft-deleted book        |
+| PATCH  | `/admin/books/:bookId`        | Restore a soft-deleted book        |
 | DELETE | `/admin/books/hard-delete/:bookId`    | Permanently delete a book          |
 
 ### Admin - Genres
@@ -364,9 +364,9 @@ All admin endpoints require `Bearer` token with `ADMIN` role.
 | Method | Endpoint                            | Auth  | Description              |
 | ------ | ----------------------------------- | ----- | ------------------------ |
 | GET    | `/admin/books/genres`               | No    | List genres (paginated)  |
-| POST   | `/admin/genres/create`              | Admin | Create a genre           |
-| PUT    | `/admin/genres/update/:genreId`     | Admin | Update a genre           |
-| DELETE | `/admin/genres/delete/:genreId`     | Admin | Delete a genre           |
+| POST   | `/admin/genres`              | Admin | Create a genre           |
+| PUT    | `/admin/genres/:genreId`     | Admin | Update a genre           |
+| DELETE | `/admin/genres/:genreId`     | Admin | Delete a genre           |
 
 ### Admin - Authors
 
