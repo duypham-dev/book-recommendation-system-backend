@@ -85,7 +85,8 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             cd /var/www/backend
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             docker compose up -d --build backend worker-email worker-cache
             docker compose run --rm migrate
             docker image prune -f
