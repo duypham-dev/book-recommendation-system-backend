@@ -11,6 +11,7 @@ import { ratingRouter } from '#routes/user/rating.routes.js';
 import { favoriteRouter } from '#routes/user/favorite.routes.js';
 import { userRecommendationRouter } from '#routes/user/recommendation.routes.js';
 import { AuthRouter } from '#routes/auth/auth.routes.js';
+import { webhookDocRouter } from '#routes/user/webhook-doc.routes.js';
 
 // ADMIN routes
 import { authorRouter } from '#routes/admin/author.routes.js';
@@ -34,6 +35,7 @@ router.use(historyRouter);
 router.use(profileRouter);
 router.use(ratingRouter);
 router.use(userRecommendationRouter);
+router.use(webhookDocRouter);
 
 // Mount auth routes
 router.use(AuthRouter);
