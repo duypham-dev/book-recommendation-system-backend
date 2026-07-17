@@ -80,7 +80,7 @@ const triggerWebhookHelper = async (webhookUrl, webhookSecret, updatedDoc) => {
     let parsedJson = null;
     try {
       parsedJson = JSON.parse(responseText);
-    } catch (err) {
+    } catch {
       parsedJson = responseText;
     }
 
