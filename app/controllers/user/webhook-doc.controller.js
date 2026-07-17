@@ -1,11 +1,9 @@
 import fs from "fs/promises";
 import path from "path";
-import { fileURLToPath } from "url";
+import os from "os";
 import { ApiResponse, logger } from "#utils/index.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const storePath = path.resolve(__dirname, "../../config/webhook-doc-store.json");
+const storePath = path.join(os.tmpdir(), "webhook-doc-store.json");
 
 // Helper to load store from json file
 const loadStore = async () => {
@@ -13,9 +11,9 @@ const loadStore = async () => {
     const data = await fs.readFile(storePath, "utf-8");
     return JSON.parse(data);
   } catch (error) {
-    logger.error(`Error reading webhook store file: ${error.message}`);
-    // If not found, return empty template
-    return {
+    logger.error(`Error reading webhook store file: ${error.message}. Initializing default store.`);
+    // If not found, return empty template with default contents
+    const defaultStore = {
       doc: {
         id: "tekbook-webhook-guide",
         title: "Hướng Dẫn Tích Hợp Webhook Cập Nhật Tự Động Cho Nguồn Website (Web Crawl)",
@@ -23,12 +21,35 @@ const loadStore = async () => {
         description: "Tài liệu hướng dẫn cấu hình webhook push để đồng bộ nội dung tự động từ CMS của trang web với cơ sở dữ liệu tri thức của chatbot.",
         version: 1,
         lastUpdated: new Date().toISOString(),
-        sections: []
+        sections: [
+          {
+            heading: "1. Tổng Quan về Webhook Cập Nhật",
+            body: "Một nguồn dữ liệu được thêm vào chatbot bằng cách crawl website có 2 cơ chế cập nhật nội dung:\n- Lịch tự động (polling): Hệ thống tự kiểm tra định kỳ mỗi N giờ, crawl lại bất kể nội dung có đổi hay không.\n- Webhook (push): Hệ thống nguồn (CMS) chủ động gửi tín hiệu ngay khi có nội dung mới, giảm độ trễ cập nhật xuống khoảng 15 giây.\n\nWebhook chỉ áp dụng được khi chúng ta kiểm soát trực tiếp hệ thống CMS của trang nguồn, nhằm cấu hình phía CMS chủ động gửi request."
+          },
+          {
+            heading: "2. Cơ Chế Debounce Tránh Quét Trùng Lặp",
+            body: "Khi CMS cập nhật nhiều trang liên tiếp trong một thao tác (ví dụ chỉnh sửa cả một mục tài liệu), nó có thể gửi nhiều request webhook dồn dập trong vài giây. Cơ chế xử lý:\n- Request đầu tiên trong một cửa sổ 15 giây: hệ thống lên lịch crawl lại sau đúng 15 giây.\n- Mọi request tiếp theo trong cùng cửa sổ: bị loại bỏ (debounced), không tạo thêm tác vụ crawl lặp lại không cần thiết."
+          },
+          {
+            heading: "3. Cơ Chế Bảo Mật với X-Webhook-Secret",
+            body: "- webhook_token (thành phần trong URL) là khoá định tuyến, không phải bí mật - chỉ cần đủ khó đoán để tránh dò quét.\n- Secret xác thực được truyền riêng qua header 'X-Webhook-Secret', không nằm trong URL và không xuất hiện trong access log.\n- Secret được mã hoá (Fernet) trước khi lưu vào database, không lưu ở dạng plaintext. Giá trị plaintext chỉ hiển thị đúng một lần tại thời điểm tạo.\n- Các trường hợp lỗi xác thực (token không tồn tại, webhook đang tắt, hoặc secret sai) đều trả về chung lỗi 403 Forbidden để ngăn dò quét."
+          },
+          {
+            heading: "4. Cấu Hình Webhook Phía CMS",
+            body: "Đưa các thông tin cấu hình webhook sau vào CMS của bạn:\n- Webhook URL: Callback URL được cấp cho nguồn này (ví dụ: http://localhost:5000/api/v1/web-crawls/webhook/<webhook_token>)\n- Method: POST\n- Header: X-Webhook-Secret: <secret_token>\n- Body: Không bắt buộc (hệ thống không đọc nội dung body)."
+          }
+        ]
       },
       webhookUrl: "",
       webhookSecret: "",
       isAutoTrigger: true
     };
+    try {
+      await fs.writeFile(storePath, JSON.stringify(defaultStore, null, 2), "utf-8");
+    } catch (writeErr) {
+      logger.error(`Error initializing default store file: ${writeErr.message}`);
+    }
+    return defaultStore;
   }
 };
 
